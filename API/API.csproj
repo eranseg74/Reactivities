@@ -6,13 +6,18 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
-  <ItemGroup>
+  <!-- Not using this package -->
+  <!-- <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
-  </ItemGroup>
+  </ItemGroup> -->
 
   <ItemGroup>
   <!-- Add a project reference to the Application layer. This allows the API layer to access the business logic defined in the Application layer. If this is not done, the API layer will not be able to use the Application layer's functionality. -->
     <ProjectReference Include="../Application/Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.2" />
   </ItemGroup>
 
 </Project>
