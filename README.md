@@ -6,7 +6,7 @@ The setup contained the following steps:
 - Create a new solution using the ```dotnet new sln``` command.
 - Create a new webapi project using the ```dotnet new webapi -n API -controllers``` command. The `-n` is for setting a name to the project and the `controllers` means that the project uses the controller-based approach where controllers are classes that derive from the ControllerBase class.
 - The project structure is as follows:
-  - <span style="color: blue, font-weight: bold">Domain<span> - This layer will contain the basic entities. This layer does not depend on any other layers.
+  - <span style="color: blue font-weight: bold">Domain<span> - This layer will contain the basic entities. This layer does not depend on any other layers.
   - <span style="color: blue, font-weight: bold">Application<span> - This layer will hold all the business logic. This layer will communicate with the <span style="color: blue, font-weight: bold">Domain<span> and on the <span style="color: blue, font-weight: bold">Persistence<span> layers and therefore, depend on them.
   - <span style="color: blue, font-weight: bold">API<span> - This layer is responsible for getting requests from the client and forward them to the <span style="color: blue, font-weight: bold">Application<span> layer, and also send the responses back to the client. It communicates and depend on the <span style="color: blue, font-weight: bold">Application<span> layer.
   - <span style="color: blue, font-weight: bold">Persistence<span> - This layer is responsible to persist data. It depeneds on the <span style="color: blue, font-weight: bold">Domain<span> layer
