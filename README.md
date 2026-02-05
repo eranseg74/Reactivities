@@ -6,12 +6,12 @@ The setup contained the following steps:
 - Create a new solution using the ```dotnet new sln``` command.
 - Create a new webapi project using the ```dotnet new webapi -n API -controllers``` command. The `-n` is for setting a name to the project and the `controllers` means that the project uses the controller-based approach where controllers are classes that derive from the ControllerBase class.
 - The project structure is as follows:
-  - <span style="color: blue, font-weight: bold">Domain<span> - This layer will contain the basic entities. This layer does not depend on any other layers.
-  - <span style="color: blue, font-weight: bold">Application<span> - This layer will hold all the business logic. This layer will communicate with the <span style="color: blue, font-weight: bold">Domain<span> and on the <span style="color: blue, font-weight: bold">Persistence<span> layers and therefore, depend on them.
-  - <span style="color: blue, font-weight: bold">API<span> - This layer is responsible for getting requests from the client and forward them to the <span style="color: blue, font-weight: bold">Application<span> layer, and also send the responses back to the client. It communicates and depend on the <span style="color: blue, font-weight: bold">Application<span> layer.
-  - <span style="color: blue, font-weight: bold">Persistence<span> - This layer is responsible to persist data. It depeneds on the <span style="color: blue, font-weight: bold">Domain<span> layer
+  - **Domain** - This layer will contain the basic entities. This layer does not depend on any other layers.
+  - **Application** - This layer will hold all the business logic. This layer will communicate with the **Domain** and on the **Persistence** layers and therefore, depend on them.
+  - **API** - This layer is responsible for getting requests from the client and forward them to the **Application** layer, and also send the responses back to the client. It communicates and depend on the **Application** layer.
+  - **Persistence** - This layer is responsible to persist data. It depeneds on the **Domain** layer
   All layers are defined in separate libraries using the ```dotnet new classlib -n <layer_name>``` command. The `-n` indicates the name of the new classlib.
-- Adding the layers to the solution using the ```dotnet sln add <layer_name>``` command (<span style="color: blue, font-weight: bold">API<span>, <span style="color: blue, font-weight: bold">Application<span>, <span style="color: blue, font-weight: bold">Persistence<span>, and <span style="color: blue, font-weight: bold">Domain<span>).
+- Adding the layers to the solution using the ```dotnet sln add <layer_name>``` command (**API**, **Application**, **Persistence**, and **Domain**).
 
 Each entity in the domain will most likely represent a table in the database.
 
