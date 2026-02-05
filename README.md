@@ -9,7 +9,8 @@ The setup contained the following steps:
   - **Domain** - This layer will contain the basic entities. This layer does not depend on any other layers.
   - **Application** - This layer will hold all the business logic. This layer will communicate with the **Domain** and on the **Persistence** layers and therefore, depend on them.
   - **API** - This layer is responsible for getting requests from the client and forward them to the **Application** layer, and also send the responses back to the client. It communicates and depend on the **Application** layer.
-  - **Persistence** - This layer is responsible to persist data. It depeneds on the **Domain** layer
+  - **Persistence** - This layer is responsible to persist data. It depeneds on the **Domain** layer.
+
   All layers are defined in separate libraries using the ```dotnet new classlib -n <layer_name>``` command. The `-n` indicates the name of the new classlib.
 - Adding the layers to the solution using the ```dotnet sln add <layer_name>``` command (**API**, **Application**, **Persistence**, and **Domain**).
 
