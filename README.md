@@ -40,15 +40,6 @@ The actual command is: ```dotnet ef database update -p Persistence -s API```. He
 ## Adding a gitignore file suitable for dotnet
 We can use dotnet to create a gitignore file. This will create the file with all the file types that comes with dotnet and should be ignored when uploading to git. The command is - ```dotnet new gitignore```
 
-
-# -----------------------------------------------------------------------------------------------------------------
-# FRONTEND - REACT
-# -----------------------------------------------------------------------------------------------------------------
-
-To create React project we use Vite using the ```npm create vite@latest``` command.
-
-We can change the port number in the `vite.config.ts` file by setting the server object (before or next to the `plugins` object) that will contain `port: <port number>` pair
-
 ## Setting up CORS (Cross Origin Resources)
 CORS controlls how resources from different origins can be accessed. It is like a set of permissions that the API server specifies in order to tell the browsers which sites are allowed to make requests to them. So it must be configured on the server side (in the Program.cs file)
 
@@ -65,3 +56,12 @@ We use the MediatR package from thre Nuget Package gallery to mediate between th
 To work with AutoMapper first we need to install the `AutoMapper` Nuget package.
 After installation we create a Core folder which will contain classes that are used in all of the project. This folder will contain a MappingProfile class in which we define the mapping strategies.
 Also, we need to define it as a service in the `Program.cs` file
+
+
+# -----------------------------------------------------------------------------------------------------------------
+# FRONTEND - REACT
+# -----------------------------------------------------------------------------------------------------------------
+
+To create React project we use Vite using the ```npm create vite@latest``` command.
+
+We can change the port number in the `vite.config.ts` file by setting the server object (before or next to the `plugins` object) that will contain `port: <port number>` pair
