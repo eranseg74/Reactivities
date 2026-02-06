@@ -65,3 +65,10 @@ Also, we need to define it as a service in the `Program.cs` file
 To create React project we use Vite using the ```npm create vite@latest``` command.
 
 We can change the port number in the `vite.config.ts` file by setting the server object (before or next to the `plugins` object) that will contain `port: <port number>` pair
+
+## Files Structure
+Inside the client (react) project we define the app and features folders.
+The **app** folder will use for more application specific that are not related to a specific feature, such as layouts, shared components, etc.
+The **features** folder will contain all the features by folders (a folder for each feature).
+The **public** folder adjacent to the **src** folder will contain all the assets (images, etc.) since when we will build the project the application will know to search for assets in this folder.
+The **lib** folder will use to hold all non-react classes such types.
