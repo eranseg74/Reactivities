@@ -17,9 +17,15 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+// Adds cross-origin resource sharing services to the specified IServiceCollection.
+// Returns: The IServiceCollection so that additional calls can be chained.
+// Requires also setting in the middleware section below
+builder.Services.AddCors();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+// The order in the middleware section is important because these middleware will be executed by their order in each request.
 // if (app.Environment.IsDevelopment())
 // {
 //     app.MapOpenApi();
@@ -28,7 +34,7 @@ var app = builder.Build();
 // app.UseHttpsRedirection(); // No need since we are running only on HTTPS
 
 // app.UseAuthorization();
-
+app.UseCors(options => options.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000", "https://localhost:3000"));
 app.MapControllers(); // This is the line that tells the API to use the controllers we defined. Without this line, the API will not be able to handle any requests and will return a 404 error for all requests.
 
 // The using keyword ensures that the scope is disposed of correctly after use.

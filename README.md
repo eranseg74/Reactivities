@@ -39,3 +39,15 @@ The actual command is: ```dotnet ef database update -p Persistence -s API```. He
 
 ## Adding a gitignore file suitable for dotnet
 We can use dotnet to create a gitignore file. This will create the file with all the file types that comes with dotnet and should be ignored when uploading to git. The command is - ```dotnet new gitignore```
+
+
+# -----------------------------------------------------------------------------------------------------------------
+# FRONTEND - REACT
+# -----------------------------------------------------------------------------------------------------------------
+
+To create React project we use Vite using the ```npm create vite@latest``` command.
+
+We can change the port number in the `vite.config.ts` file by setting the server object (before or next to the `plugins` object) that will contain `port: <port number>` pair
+
+## Setting up CORS (Cross Origin Resources)
+CORS controlls how resources from different origins can be accessed. It is like a set of permissions that the API server specifies in order to tell the browsers which sites are allowed to make requests to them. So it must be configured on the server side (in the Program.cs file)
