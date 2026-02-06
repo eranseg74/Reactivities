@@ -1,3 +1,5 @@
+using Application.Activities.Queries;
+using Application.Core;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
@@ -21,6 +23,19 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 // Returns: The IServiceCollection so that additional calls can be chained.
 // Requires also setting in the middleware section below
 builder.Services.AddCors();
+
+// Adding MediatR to the service collection to enable the mediator pattern in the application. The RegisterServicesFromAssemblyContaining method is used to register all the handlers, requests, and notifications defined in the specified assembly. In this case, we are registering the services from the assembly that contains the GetActivityList.Handler class.
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.LicenseKey = "eyJhbGciOiJSUzI1NiIsImtpZCI6Ikx1Y2t5UGVubnlTb2Z0d2FyZUxpY2Vuc2VLZXkvYmJiMTNhY2I1OTkwNGQ4OWI0Y2IxYzg1ZjA4OGNjZjkiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2x1Y2t5cGVubnlzb2Z0d2FyZS5jb20iLCJhdWQiOiJMdWNreVBlbm55U29mdHdhcmUiLCJleHAiOiIxODAxODcyMDAwIiwiaWF0IjoiMTc3MDM3Mzg1MyIsImFjY291bnRfaWQiOiIwMTljMzI3YzhlYTY3OTcyOTlmYzM0OTkwNjdjYTQwOCIsImN1c3RvbWVyX2lkIjoiY3RtXzAxa2dzODJjZXczODBlc2Y3ZWR4dmd5M3YxIiwic3ViX2lkIjoiLSIsImVkaXRpb24iOiIwIiwidHlwZSI6IjIifQ.0ykoDAmRgB5Y-euiUc1Lg5cmABPdgEQR8qMov-H81kS39K0G03EaC5pw4zLukZi-tICs0FBYbCfbp4S_TS2-OF0C1SfZjUrSf79UaNJBli4rvmMCKPJ17cJRIITngdzRHPM-694j3ZgnFxcMyq8wvqbGw9nXac4jgK_z0-32_kPAUhO8CovFWWvB1sSlbkBXFmA2VzE-h4MgSBJsPAr3McwSvA1iZ9eTzWHaQbnMCUeOUZaoUCprgzB7uvNslrLI6_zGjrxzdrAsZDQOjDs_ndqGZdhTNmmKnXqDZx624gEBbDzuW869u-Jj9m1j9fTVPBfZevYpuMa993zUkYqKbg";
+    cfg.RegisterServicesFromAssemblyContaining<GetActivityList.Handler>();
+});
+
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.LicenseKey = "eyJhbGciOiJSUzI1NiIsImtpZCI6Ikx1Y2t5UGVubnlTb2Z0d2FyZUxpY2Vuc2VLZXkvYmJiMTNhY2I1OTkwNGQ4OWI0Y2IxYzg1ZjA4ODNjZjkiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2x1Y2t5cGVubnlzb2Z0d2FyZS5jb20iLCJhdWQiOiJMdWNreVBlbm55U29mdHdhcmUiLCJleHAiOiIxODAxODcyMDAwIiwiaWF0IjoiMTc3MDM3Mzg1MyIsImFjY291bnRfaWQiOiIwMTljMzI3YzhlYTY3OTcyOTlmYzM0OTkwNjdjYTQwOCIsImN1c3RvbWVyX2lkIjoiY3RtXzAxa2dzODJjZXczODBlc2Y3ZWR4dmd5M3YxIiwic3ViX2lkIjoiLSIsImVkaXRpb24iOiIwIiwidHlwZSI6IjIifQ.0ykoDAmRgB5Y-euiUc1Lg5cmABPdgEQR8qMov-H81kS39K0G03EaC5pw4zLukZi-tICs0FBYbCfbp4S_TS2-OF0C1SfZjUrSf79UaNJBli4rvmMCKPJ17cJRIITngdzRHPM-694j3ZgnFxcMyq8wvqbGw9nXac4jgK_z0-32_kPAUhO8CovFWWvB1sSlbkBXFmA2VzE-h4MgSBJsPAr3McwSvA1iZ9eTzWHaQbnMCUeOUZaoUCprgzB7uvNslrLI6_zGjrxzdrAsZDQOjDs_ndqGZdhTNmmKnXqDZx624gEBbDzuW869u-Jj9m1j9fTVPBfZevYpuMa993zUkYqKbg";
+    cfg.AddMaps(typeof(MappingProfiles).Assembly);
+});
 
 var app = builder.Build();
 

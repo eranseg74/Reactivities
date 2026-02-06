@@ -51,3 +51,17 @@ We can change the port number in the `vite.config.ts` file by setting the server
 
 ## Setting up CORS (Cross Origin Resources)
 CORS controlls how resources from different origins can be accessed. It is like a set of permissions that the API server specifies in order to tell the browsers which sites are allowed to make requests to them. So it must be configured on the server side (in the Program.cs file)
+
+# CQRS - Command Query Responsibility Segragation (sometimes known as Command Query Separation)
+Separates commands from queries
+**Commands** - Does something, modifies State, and should not return a value.
+**Queries** - Answers a question, does not modify a State, and should return a value.
+
+# Mediator
+Since the data flow is in one direction - From the API layer to the Application layer, to the Domain and Persistence layer, and from the Persistence to the Domain layer, if the API makes a call to the Application, the Application does not "know" about the API. To send the data back to the API layer we implement a Mediator which will be responsible to send a response (mediate) back to the layer that issued the request.
+We use the MediatR package from thre Nuget Package gallery to mediate between the layers.
+
+# AutoMapper
+To work with AutoMapper first we need to install the `AutoMapper` Nuget package.
+After installation we create a Core folder which will contain classes that are used in all of the project. This folder will contain a MappingProfile class in which we define the mapping strategies.
+Also, we need to define it as a service in the `Program.cs` file
