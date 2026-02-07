@@ -4,16 +4,13 @@ import {
   AppBar,
   Toolbar,
   Typography,
-  Button,
   Container,
   MenuItem,
 } from "@mui/material";
+import { NavLink } from "react-router";
+import MenuItemLink from "../shared/components/MenuItemLink";
 
-type Props = {
-  openForm: () => void;
-};
-
-export default function NavBar({ openForm }: Props) {
+export default function NavBar() {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar
@@ -26,7 +23,11 @@ export default function NavBar({ openForm }: Props) {
         <Container maxWidth='xl'>
           <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
             <Box>
-              <MenuItem sx={{ display: "flex", gap: 2 }}>
+              <MenuItem
+                component={NavLink}
+                to='/'
+                sx={{ display: "flex", gap: 2 }}
+              >
                 <Group fontSize='large' />
                 <Typography variant='h4' fontWeight='bold'>
                   Reactivities
@@ -34,42 +35,15 @@ export default function NavBar({ openForm }: Props) {
               </MenuItem>
             </Box>
             <Box sx={{ display: "flex" }}>
-              <MenuItem
-                sx={{
-                  fontSize: "1.2rem",
-                  textTransform: "uppercase",
-                  fontWeight: "bold",
-                }}
+              <MenuItemLink
+                // Adding the '/' prefix to ensure the link is resolved correctly and doesn't cause issues with relative paths. Otherswise, if the current URL is something like '/activities', clicking on the 'Activities' link without the '/' prefix could lead to a URL like '/activities/activities', which is not intended.
+                to='/activities'
               >
                 Activities
-              </MenuItem>
-              <MenuItem
-                sx={{
-                  fontSize: "1.2rem",
-                  textTransform: "uppercase",
-                  fontWeight: "bold",
-                }}
-              >
-                About
-              </MenuItem>
-              <MenuItem
-                sx={{
-                  fontSize: "1.2rem",
-                  textTransform: "uppercase",
-                  fontWeight: "bold",
-                }}
-              >
-                Contact
-              </MenuItem>
+              </MenuItemLink>
+              <MenuItemLink to='/createActivity'>Create Activity</MenuItemLink>
             </Box>
-            <Button
-              size='large'
-              variant='contained'
-              color='warning'
-              onClick={openForm}
-            >
-              Create activity
-            </Button>
+            <MenuItem>User Menu</MenuItem>
           </Toolbar>
         </Container>
       </AppBar>

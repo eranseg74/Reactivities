@@ -1,19 +1,13 @@
 import { Paper, Typography, Box, TextField, Button } from "@mui/material";
 import type { SubmitEvent } from "react";
 import { useActivities } from "../../../lib/hooks/useActivities";
+import { useNavigate, useParams } from "react-router";
 
-type Props = {
-  activity?: Activity;
-  closeForm: () => void;
-  // submitForm: (activity: Activity) => void;
-};
-
-export default function ActivityForm({
-  activity,
-  closeForm,
-  // submitForm,
-}: Props) {
-  const { updateActivity, createActivity } = useActivities();
+export default function ActivityForm() {
+  const { id } = useParams();
+  const { updateActivity, createActivity, activity, isLoadingActivity } =
+    useActivities(id);
+  const navigate = useNavigate();
   // The type of the event is SubmitEvent and the generic type is HTMLFormElement since this event is triggered on a form element
   const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -41,16 +35,26 @@ export default function ActivityForm({
       // Since the data object is of type { [key: string]: FormDataEntryValue }, we need to cast it to the Activity type before we can pass it to the submitForm function. We can use the as keyword to perform a type assertion and tell TypeScript that we know that the data object is of type Activity. This is necessary because the submitForm function expects an argument of type Activity, and without the type assertion, TypeScript would give us an error since it cannot guarantee that the data object is of the correct type. We use the unknown type as an intermediate step in the type assertion to bypass TypeScript's type checking and allow us to assert that the data object is of type Activity. This is a common pattern when we need to perform a type assertion on an object that has a more general type, such as { [key: string]: FormDataEntryValue }, and we want to assert that it is of a more specific type, such as Activity. What it does is it first asserts that the data object is of type unknown, which is a type that can represent any value, and then it asserts that the unknown value is of type Activity. This allows us to bypass TypeScript's type checking and assert that the data object is of the correct type without getting an error.
       // submitForm(data as unknown as Activity);
       await updateActivity.mutateAsync(data as unknown as Activity);
+      navigate(`/activities/${activity.id}`);
     } else {
-      await createActivity.mutateAsync(data as unknown as Activity);
+      // Here we are not using async version of the mutate function because we want to navigate to the activity details page after the mutation is successful, and we can achieve that by using the onSuccess callback of the mutate function. The onSuccess callback is called after the mutation is successful and it receives the result of the mutation as an argument. In this case, since our createActivity mutation returns the id of the created activity, we can use that id to navigate to the activity details page after the activity is created.
+      // If we were to use the async version of the mutate function, we would have to wait for the mutation to complete before we can navigate to the activity details page, which would make the user experience less smooth. By using the onSuccess callback, we can navigate to the activity details page immediately after the mutation is successful without having to wait for the mutation to complete.
+      createActivity.mutate(data as unknown as Activity, {
+        onSuccess: (id) => {
+          navigate(`/activities/${id}`);
+        },
+      });
     }
-    closeForm();
   };
+
+  if (isLoadingActivity) {
+    return <Typography>Loading activity...</Typography>;
+  }
 
   return (
     <Paper sx={{ borderRadius: 3, padding: 3 }}>
       <Typography variant='h5' gutterBottom color='primary'>
-        Create activity
+        {activity ? "Edit activity" : "Create activity"}
       </Typography>
       <Box
         component='form'
@@ -85,7 +89,7 @@ export default function ActivityForm({
         <TextField name='city' label='City' defaultValue={activity?.city} />
         <TextField name='venue' label='Venue' defaultValue={activity?.venue} />
         <Box display='flex' justifyContent='end' gap={3}>
-          <Button color='inherit' onClick={closeForm}>
+          <Button color='inherit' onClick={() => {}}>
             Cancel
           </Button>
           {/* When we define the button type as 'submit' this means that clicking on the button will execute the onSubmit function in the form element */}
