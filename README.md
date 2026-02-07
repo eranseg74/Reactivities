@@ -101,3 +101,15 @@ React Query comes with a DevTool that help visualize all the inner workings of R
 The first steps of using React Query is always to create a `queryClient` and wrap the application in a <QueryClientProvider>. When doing server rendering, it's important to create the queryClient instance inside of your app, in __React__ state (an instance ref works fine too). This ensures that data is not shared between different users and requests, while still only creating the queryClient once per component lifecycle.
 
 Note that the <ReactQueryDevTtools /> also needs the query client so it has to be inside the <QueryClientProvider>
+
+## React Router
+To set up React Router we need to install the following package: ```npm i react-router```
+
+Aftetr installation we create a Routes.tsx file (in this project it is inside the app/router folder)
+In this file we will define all of the routes in the application. Each route contains a path and the element that will be displayed if the specified path mathes the current path.
+We create a router object using the `createBrowserRouter` function which gets an array of objects as a prameter, where each object specifies a route.
+A route can have children - will show in the path. For example - `/` might point to the <App /> component and `/activities` which will refer to the <ActivityDashboard /> might be a child of the <App /> component
+
+React router gives us abilities such as getting the params (useParams), getting the query parameters (useSearchParams), navigation (useNavigation), our current location (useLoacation), and more.
+
+After creating the router in the Routes.tsx file we swap the <App /> component with the router provider <RouterProvider router={router} />. The router is the object created in the Routes.tsx file
