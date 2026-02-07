@@ -113,3 +113,56 @@ A route can have children - will show in the path. For example - `/` might point
 React router gives us abilities such as getting the params (useParams), getting the query parameters (useSearchParams), navigation (useNavigation), our current location (useLoacation), and more.
 
 After creating the router in the Routes.tsx file we swap the <App /> component with the router provider <RouterProvider router={router} />. The router is the object created in the Routes.tsx file
+
+# MobX
+__MobX__ is a signal based, battle-tested library that makes state management simple and scalable by transparently applying functional reactive programming.
+
+### Installation:
+Requires installation of 2 packages, mobx and mobx-react-lite - ```npm install mobx mobx-react-lite```
+
+## Steps to Implement MobX:
+1. **Install MobX and React Bindings**:
+   Install MobX and the necessary React bindings (usually mobx-react-lite for functional components).
+
+   ```npm install mobx mobx-react-lite```
+
+2. **Define the Data Store (Observable State)**:
+   Creating a class or object to hold the application state. Use makeAutoObservable(this) in the constructor to automatically make properties observable and methods actions.
+
+   ```import { makeAutoObservable } from "mobx";```
+
+   ```class TimerStore {```
+     ```secondsPassed = 0;```
+     ```constructor() {```
+       ```makeAutoObservable(this); // Automatically tracks state and actions```
+     ```}```
+     ```increase() {```
+       ```this.secondsPassed += 1;```
+     ```}```
+   ```}```
+   ```const myTimer = new TimerStore();```
+   ```export default myTimer;```
+
+3. **Create Actions to Update State**:
+   Defining methods within the store (actions) that modify the state. In makeAutoObservable, these are automatically treated as actions, which is best practice for modifying state.
+
+4. **Make React Components Reactive**:
+   Wrapping the React components with the observer function from mobx-react-lite. This ensures the component re-renders whenever the data it uses in the store changes.
+
+   ```import { observer } from "mobx-react-lite";```
+   ```import myTimer from "./TimerStore";```
+
+   ```const TimerView = observer(({ timer }) => (```
+     ```<button onClick={() => timer.increase()}>```
+       ```Seconds passed: {timer.secondsPassed}```
+     ```</button>```
+   ```));```
+
+5. **Use the Store in the Component Tree**:
+   Passing the store instance to the relevant components, usually via props or a Context Provider. 
+
+**Core Concepts Summary**:
+- __Observable__: Data that can be tracked.
+- __Action__: Functions that change state.
+- __Observer__: Components that update when observables change.
+- __Computed__: Values derived from state, cached automatically. 

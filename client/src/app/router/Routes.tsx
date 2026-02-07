@@ -4,6 +4,7 @@ import HomePage from "../../features/home/HomePage";
 import ActivityDashboard from "../../features/activities/dashboard/ActivityDashboard";
 import ActivityForm from "../../features/activities/form/ActivityForm";
 import ActivityDetailPage from "../../features/activities/details/ActivityDetailPage";
+import Counter from "../../features/counter/Counter";
 
 export const router = createBrowserRouter([
   {
@@ -18,6 +19,7 @@ export const router = createBrowserRouter([
       // We also added a key to the createActivity route to force the component to remount when we navigate to the create activity page. This is necessary because when we navigate from the edit activity page to the create activity page, the ActivityForm component does not unmount and remount, it just updates the props. This causes an issue because the form fields are populated with the data of the activity we were editing, and when we navigate to the create activity page, we want the form fields to be empty. By adding a key to the route, we force the component to remount and reset its state, which allows us to have an empty form when we navigate to the create activity page.
       { path: "createActivity", element: <ActivityForm key='create' /> },
       { path: "manage/:id", element: <ActivityForm /> },
+      { path: "counter", element: <Counter /> },
     ],
   },
 ]);
