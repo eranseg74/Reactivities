@@ -72,3 +72,32 @@ The **app** folder will use for more application specific that are not related t
 The **features** folder will contain all the features by folders (a folder for each feature).
 The **public** folder adjacent to the **src** folder will contain all the assets (images, etc.) since when we will build the project the application will know to search for assets in this folder.
 The **lib** folder will use to hold all non-react classes such types.
+Inside the __lib__ folder we add a __hooks__ folder. It will contain all the custom hooks we create. The purpose of the custom hooks is to take away all the logic in the components so they will include only the content that needs to be displayed.
+
+## React Query
+TanStack Query (formerly known as React Query) is often described as the missing data-fetching library for web applications, but in more technical terms, it makes fetching, caching, synchronizing and updating server state in your web applications a breeze.
+While most traditional state management libraries are great for working with client state, they are not so great at working with async or server state. This is because server state is totally different. For starters, server state:
+- Is persisted remotely in a location you may not control or own
+- Requires asynchronous APIs for fetching and updating
+- Implies shared ownership and can be changed by other people without your knowledge
+- Can potentially become "out of date" in your applications if you're not careful
+
+Once you grasp the nature of server state in your application, even more challenges will arise as you go, for example:
+- Caching... (possibly the hardest thing to do in programming)
+- Deduping multiple requests for the same data into a single request
+- Updating "out of date" data in the background
+- Knowing when data is "out of date"
+- Reflecting updates to data as quickly as possible
+- Performance optimizations like pagination and lazy loading data
+- Managing memory and garbage collection of server state
+- Memoizing query results with structural sharing
+
+To use it we need to install the following package - ```npm i @tanstack/react-query```
+
+It is recommended to also use our ESLint Plugin Query to help you catch bugs and inconsistencies while you code. You can install it via: ```npm i -D @tanstack/eslint-plugin-query```
+
+React Query comes with a DevTool that help visualize all the inner workings of React Query and will likely save you hours of debugging if you find yourself in a pinch! Installation via - ```npm i @tanstack/react-query-devtools```
+
+The first steps of using React Query is always to create a `queryClient` and wrap the application in a <QueryClientProvider>. When doing server rendering, it's important to create the queryClient instance inside of your app, in __React__ state (an instance ref works fine too). This ensures that data is not shared between different users and requests, while still only creating the queryClient once per component lifecycle.
+
+Note that the <ReactQueryDevTtools /> also needs the query client so it has to be inside the <QueryClientProvider>

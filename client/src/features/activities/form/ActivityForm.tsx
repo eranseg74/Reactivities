@@ -1,19 +1,21 @@
 import { Paper, Typography, Box, TextField, Button } from "@mui/material";
 import type { SubmitEvent } from "react";
+import { useActivities } from "../../../lib/hooks/useActivities";
 
 type Props = {
   activity?: Activity;
   closeForm: () => void;
-  submitForm: (activity: Activity) => void;
+  // submitForm: (activity: Activity) => void;
 };
 
 export default function ActivityForm({
   activity,
   closeForm,
-  submitForm,
+  // submitForm,
 }: Props) {
+  const { updateActivity, createActivity } = useActivities();
   // The type of the event is SubmitEvent and the generic type is HTMLFormElement since this event is triggered on a form element
-  const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
     // FormData is a built-in JS class that allows us to easily extract the data from a form element. We need to pass the form element as an argument to the constructor and we can get the form element from the currentTarget property of the event object whicj is the element that the event is triggered on. In this case, since the event is triggered on a form element, the currentTarget will be the form element.
     const formData = new FormData(event.currentTarget);
@@ -26,9 +28,23 @@ export default function ActivityForm({
     if (activity) {
       // In case of activity update
       data.id = activity.id;
+
+      // The mutate is a mutation function we can call with variables to trigger the mutation and optionally hooks on additional callback options.
+      // @param variables — The variables object to pass to the mutationFn.
+      // @param options.onSuccess — This function will fire when the mutation is successful and will be passed the mutation's result.
+      // @param options.onError — This function will fire if the mutation encounters an error and will be passed the error.
+      // @param options.onSettled — This function will fire when the mutation is either successfully fetched or encounters an error and be passed either the data or error.
+      // @remarks
+      // If we make multiple requests, onSuccess will fire only after the latest call you've made.
+      // All the callback functions (onSuccess, onError, onSettled) are void functions, and the returned value will be ignored.
+      // Here we are using the async version of the mutate function because we want to close the form after the mutation finished.
+      // Since the data object is of type { [key: string]: FormDataEntryValue }, we need to cast it to the Activity type before we can pass it to the submitForm function. We can use the as keyword to perform a type assertion and tell TypeScript that we know that the data object is of type Activity. This is necessary because the submitForm function expects an argument of type Activity, and without the type assertion, TypeScript would give us an error since it cannot guarantee that the data object is of the correct type. We use the unknown type as an intermediate step in the type assertion to bypass TypeScript's type checking and allow us to assert that the data object is of type Activity. This is a common pattern when we need to perform a type assertion on an object that has a more general type, such as { [key: string]: FormDataEntryValue }, and we want to assert that it is of a more specific type, such as Activity. What it does is it first asserts that the data object is of type unknown, which is a type that can represent any value, and then it asserts that the unknown value is of type Activity. This allows us to bypass TypeScript's type checking and assert that the data object is of the correct type without getting an error.
+      // submitForm(data as unknown as Activity);
+      await updateActivity.mutateAsync(data as unknown as Activity);
+    } else {
+      await createActivity.mutateAsync(data as unknown as Activity);
     }
-    // Since the data object is of type { [key: string]: FormDataEntryValue }, we need to cast it to the Activity type before we can pass it to the submitForm function. We can use the as keyword to perform a type assertion and tell TypeScript that we know that the data object is of type Activity. This is necessary because the submitForm function expects an argument of type Activity, and without the type assertion, TypeScript would give us an error since it cannot guarantee that the data object is of the correct type. We use the unknown type as an intermediate step in the type assertion to bypass TypeScript's type checking and allow us to assert that the data object is of type Activity. This is a common pattern when we need to perform a type assertion on an object that has a more general type, such as { [key: string]: FormDataEntryValue }, and we want to assert that it is of a more specific type, such as Activity. What it does is it first asserts that the data object is of type unknown, which is a type that can represent any value, and then it asserts that the unknown value is of type Activity. This allows us to bypass TypeScript's type checking and assert that the data object is of the correct type without getting an error.
-    submitForm(data as unknown as Activity);
+    closeForm();
   };
 
   return (
@@ -59,7 +75,11 @@ export default function ActivityForm({
         <TextField
           name='date'
           label='Date'
-          defaultValue={activity?.date}
+          defaultValue={
+            activity?.date
+              ? new Date(activity.date + "Z").toISOString().split("T")[0]
+              : new Date().toISOString().split("T")[0]
+          }
           type='date'
         />
         <TextField name='city' label='City' defaultValue={activity?.city} />
@@ -69,7 +89,13 @@ export default function ActivityForm({
             Cancel
           </Button>
           {/* When we define the button type as 'submit' this means that clicking on the button will execute the onSubmit function in the form element */}
-          <Button type='submit' color='success' variant='contained'>
+          <Button
+            type='submit'
+            color='success'
+            variant='contained'
+            disabled={updateActivity.isPending || createActivity.isPending}
+            loading={updateActivity.isPending || createActivity.isPending}
+          >
             Submit
           </Button>
         </Box>
