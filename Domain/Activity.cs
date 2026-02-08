@@ -9,6 +9,7 @@ namespace Domain
         public DateTime Date { get; set; }
         public required string Description { get; set; }
         public required string Category { get; set; }
+        public bool IsCancelled { get; set; }
 
         // location details
         public required string City { get; set; }

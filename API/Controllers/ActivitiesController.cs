@@ -1,4 +1,5 @@
 using Application.Activities.Commands;
+using Application.Activities.DTOs;
 using Application.Activities.Queries;
 using Domain;
 using Microsoft.AspNetCore.Mvc;
@@ -16,26 +17,27 @@ namespace API.Controllers
             // Without Mediator
             //return await context.Activities.ToListAsync();
             // With Mediator
-            return await Mediator.Send(new GetActivityList.Query(), token);
+            return HandleResult(await Mediator.Send(new GetActivityList.Query(), token));
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Activity>> GetActivityDetail(string id, CancellationToken token)
         {
-            return await Mediator.Send(new GetActivityDetails.Query { Id = id }, token);
+            return HandleResult(await Mediator.Send(new GetActivityDetails.Query { Id = id }, token));
+
         }
 
         [HttpPost]
-        public async Task<ActionResult<string>> CreateActivity(Activity activity)
+        // Note that as a parameter we are getting the CreateActivityDto object
+        public async Task<ActionResult<string>> CreateActivity(CreateActivityDto activityDto)
         {
-            return await Mediator.Send(new CreateActivity.Command { Activity = activity });
+            return HandleResult(await Mediator.Send(new CreateActivity.Command { ActivityDto = activityDto }));
         }
 
         [HttpPut]
-        public async Task<ActionResult> EditActivity(Activity activity)
+        public async Task<ActionResult> EditActivity(EditActivityDto activity)
         {
-            await Mediator.Send(new EditActivity.Command { Activity = activity });
-            return NoContent();
+            return HandleResult(await Mediator.Send(new EditActivity.Command { ActivityDto = activity }));
         }
 
         [HttpDelete("{id}")]

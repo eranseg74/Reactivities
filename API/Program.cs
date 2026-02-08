@@ -1,5 +1,8 @@
+using API.Middleware;
 using Application.Activities.Queries;
+using Application.Activities.Validators;
 using Application.Core;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
@@ -29,6 +32,8 @@ builder.Services.AddMediatR(cfg =>
 {
     cfg.LicenseKey = "eyJhbGciOiJSUzI1NiIsImtpZCI6Ikx1Y2t5UGVubnlTb2Z0d2FyZUxpY2Vuc2VLZXkvYmJiMTNhY2I1OTkwNGQ4OWI0Y2IxYzg1ZjA4OGNjZjkiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2x1Y2t5cGVubnlzb2Z0d2FyZS5jb20iLCJhdWQiOiJMdWNreVBlbm55U29mdHdhcmUiLCJleHAiOiIxODAxODcyMDAwIiwiaWF0IjoiMTc3MDM3Mzg1MyIsImFjY291bnRfaWQiOiIwMTljMzI3YzhlYTY3OTcyOTlmYzM0OTkwNjdjYTQwOCIsImN1c3RvbWVyX2lkIjoiY3RtXzAxa2dzODJjZXczODBlc2Y3ZWR4dmd5M3YxIiwic3ViX2lkIjoiLSIsImVkaXRpb24iOiIwIiwidHlwZSI6IjIifQ.0ykoDAmRgB5Y-euiUc1Lg5cmABPdgEQR8qMov-H81kS39K0G03EaC5pw4zLukZi-tICs0FBYbCfbp4S_TS2-OF0C1SfZjUrSf79UaNJBli4rvmMCKPJ17cJRIITngdzRHPM-694j3ZgnFxcMyq8wvqbGw9nXac4jgK_z0-32_kPAUhO8CovFWWvB1sSlbkBXFmA2VzE-h4MgSBJsPAr3McwSvA1iZ9eTzWHaQbnMCUeOUZaoUCprgzB7uvNslrLI6_zGjrxzdrAsZDQOjDs_ndqGZdhTNmmKnXqDZx624gEBbDzuW869u-Jj9m1j9fTVPBfZevYpuMa993zUkYqKbg";
     cfg.RegisterServicesFromAssemblyContaining<GetActivityList.Handler>();
+    // Adding the validation behavior to the MediatR pipeline. This will ensure that all requests that go through the mediator will be validated using the FluentValidation validators we defined in the application. The AddOpenBehavior method is used to add a behavior to the MediatR pipeline, and we specify the type of the behavior as ValidationBehavior<,> which is a generic class that takes two type parameters: the request type and the response type. By adding this behavior to the pipeline, we can ensure that all requests are validated before they are handled by their respective handlers.
+    cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
 
 builder.Services.AddAutoMapper(cfg =>
@@ -37,7 +42,15 @@ builder.Services.AddAutoMapper(cfg =>
     cfg.AddMaps(typeof(MappingProfiles).Assembly);
 });
 
+// Adding the Fluent validators services
+// This adds all validators in the assembly of the type specified by the generic parameter
+builder.Services.AddValidatorsFromAssemblyContaining<CreateActivityValidator>();
+
+builder.Services.AddTransient<ExceptionMiddleware>(); // Add the custom exception handling middleware to the service collection. This allows us to use this middleware in the HTTP request pipeline to handle exceptions that occur during the processing of requests and return appropriate error responses to the client.
+
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionMiddleware>(); // Use the custom exception handling middleware in the HTTP request pipeline. This will ensure that any exceptions that occur during the processing of requests are caught and handled by this middleware, allowing us to return appropriate error responses to the client and improve the overall robustness of the application. Note that this must be positioned at the top of the middleware pipeline to ensure that it can catch exceptions from all subsequent middleware and request processing. By placing it at the top, we can ensure that any exceptions that occur during the processing of requests are caught and handled by this middleware, allowing us to return appropriate error responses to the client and improve the overall robustness of the application.
 
 // Configure the HTTP request pipeline.
 // The order in the middleware section is important because these middleware will be executed by their order in each request.

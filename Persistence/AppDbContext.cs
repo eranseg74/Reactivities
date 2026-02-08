@@ -1,14 +1,39 @@
 using Microsoft.EntityFrameworkCore;
 using Domain;
+using Microsoft.VisualBasic;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace Persistence
+namespace Persistence;
+
+// A DbContext instance represents a session with the database and can be used to query and save instances of your entities. DbContext is a combination of the Unit Of Work and Repository patterns.
+// It is a fundamental part of Entity Framework Core and is responsible for managing the database connections, tracking changes to entities, and coordinating database operations.
+// We are inheriting from the DbContext class provided by Entity Framework Core to create our own database context class called AppDbContext. We also provide a constructor that takes DbContextOptions as a parameter and passes it to the base class constructor. The options are defined in the API's Program.cs file where we register the DbContext with the appropriate options as a service.
+public class AppDbContext(DbContextOptions options) : DbContext(options)
 {
-    // A DbContext instance represents a session with the database and can be used to query and save instances of your entities. DbContext is a combination of the Unit Of Work and Repository patterns.
-    // It is a fundamental part of Entity Framework Core and is responsible for managing the database connections, tracking changes to entities, and coordinating database operations.
-    // We are inheriting from the DbContext class provided by Entity Framework Core to create our own database context class called AppDbContext. We also provide a constructor that takes DbContextOptions as a parameter and passes it to the base class constructor. The options are defined in the API's Program.cs file where we register the DbContext with the appropriate options as a service.
-    public class AppDbContext(DbContextOptions options) : DbContext(options)
+    // The EntityFramework uses the DbSet<T> properties to know which entities we want to include in the model. Each DbSet<T> property corresponds to a table in the database, and the type parameter T represents the entity type that will be stored in that table. The name of the DbSet<T> property is used as the name of the table in the database (Activities in this case) unless we specify a different name using data annotations or Fluent API configurations. It will look at the Activity class to determine the columns and their types in the Activities table.
+    public required DbSet<Activity> Activities { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        // The EntityFramework uses the DbSet<T> properties to know which entities we want to include in the model. Each DbSet<T> property corresponds to a table in the database, and the type parameter T represents the entity type that will be stored in that table. The name of the DbSet<T> property is used as the name of the table in the database (Activities in this case) unless we specify a different name using data annotations or Fluent API configurations. It will look at the Activity class to determine the columns and their types in the Activities table.
-        public required DbSet<Activity> Activities { get; set; }
+        base.OnModelCreating(builder);
+
+        var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
+            v => v.ToUniversalTime(), // Convert to UTC when saving to the database
+            v => DateTime.SpecifyKind(v, DateTimeKind.Utc) // Specify that the DateTime is in UTC when reading from the database
+        );
+
+        foreach (var entityType in builder.Model.GetEntityTypes())
+        {
+            foreach (var property in entityType.GetProperties())
+            {
+                if (property.ClrType == typeof(DateTime))
+                {
+                    property.SetValueConverter(dateTimeConverter);
+                }
+            }
+        }
     }
+
+
+
 }
