@@ -2,7 +2,11 @@ using API.Middleware;
 using Application.Activities.Queries;
 using Application.Activities.Validators;
 using Application.Core;
+using Domain;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
@@ -11,7 +15,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 // Services - If we want a certain functionallity we can define it in a class. To use this functionallity inside the API we need to inject it as a dependency. This way it will be on the dotnet responsibility to create instances from this class when required, and also despose of it when not required any more
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(opt =>
+{
+    var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+    opt.Filters.Add(new AuthorizeFilter(policy));
+});
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 // builder.Services.AddOpenApi(); // Package removed
 builder.Services.AddDbContext<AppDbContext>(opt =>
@@ -48,6 +56,12 @@ builder.Services.AddValidatorsFromAssemblyContaining<CreateActivityValidator>();
 
 builder.Services.AddTransient<ExceptionMiddleware>(); // Add the custom exception handling middleware to the service collection. This allows us to use this middleware in the HTTP request pipeline to handle exceptions that occur during the processing of requests and return appropriate error responses to the client.
 
+// Adding the Identity framework. This will add the necessary services for authentication and authorization using Identity. We specify the type of the user as User, which is our custom user class that inherits from IdentityUser. We also configure some options for the Identity framework, such as requiring unique email addresses for users. Finally, we specify that we want to use Entity Framework Core to store the identity data, and we specify our AppDbContext as the context to use for this purpose. This will allow us to manage users, roles, and other identity-related data in our database using Entity Framework Core.
+builder.Services.AddIdentityApiEndpoints<User>(opt =>
+{
+    opt.User.RequireUniqueEmail = true;
+}).AddRoles<IdentityRole>().AddEntityFrameworkStores<AppDbContext>();
+
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionMiddleware>(); // Use the custom exception handling middleware in the HTTP request pipeline. This will ensure that any exceptions that occur during the processing of requests are caught and handled by this middleware, allowing us to return appropriate error responses to the client and improve the overall robustness of the application. Note that this must be positioned at the top of the middleware pipeline to ensure that it can catch exceptions from all subsequent middleware and request processing. By placing it at the top, we can ensure that any exceptions that occur during the processing of requests are caught and handled by this middleware, allowing us to return appropriate error responses to the client and improve the overall robustness of the application.
@@ -62,8 +76,17 @@ app.UseMiddleware<ExceptionMiddleware>(); // Use the custom exception handling m
 // app.UseHttpsRedirection(); // No need since we are running only on HTTPS
 
 // app.UseAuthorization();
-app.UseCors(options => options.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000", "https://localhost:3000"));
+// CORS (Cross-Origin Resource Sharing) is a security feature implemented by web browsers to restrict web applications running on one origin (domain) from accessing resources on a different origin. This is done to prevent malicious websites from making unauthorized requests to other websites on behalf of the user. By configuring CORS in our API, we can specify which origins are allowed to access our API and what types of requests they can make. In this case, we are allowing any header, any method, and credentials (cookies) from the specified origins (http://localhost:3000 and https://localhost:3000). This means that our API will accept requests from these origins and allow them to include credentials such as cookies in their requests. This is important for enabling authentication and maintaining user sessions when making requests from the client application running on these origins.
+app.UseCors(options => options.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins("http://localhost:3000", "https://localhost:3000"));
+
+// The order is important! We have to authenticate the user first before we can authorize the user to do what he needs to do
+app.UseAuthentication(); // Use the authentication middleware to enable authentication in the application. This will allow us to authenticate users and protect certain endpoints that require authentication. By adding this middleware, we can ensure that only authenticated users can access protected resources and perform certain actions in the application, enhancing security and controlling access to sensitive data and functionality.
+app.UseAuthorization(); // Use the authorization middleware to enable authorization in the application. This will allow us to authorize users based on their roles and permissions, and protect certain endpoints that require specific roles or permissions. By adding this middleware, we can ensure that only authorized users can access protected resources and perform certain actions in the application, enhancing security and controlling access to sensitive data and functionality.
+
 app.MapControllers(); // This is the line that tells the API to use the controllers we defined. Without this line, the API will not be able to handle any requests and will return a 404 error for all requests.
+
+// Mapping the API Identity endpoint. This will automatically create endpoints for user registration, login, logout, and other identity-related operations based on the Identity framework. By mapping these endpoints, we can easily manage user authentication and authorization in our application without having to manually create these endpoints ourselves. The MapIdentityApi method is a convenient way to set up the necessary endpoints for user management and authentication using the Identity framework. We specify the type of the user as User, which is our custom user class that inherits from IdentityUser. This will allow us to manage users, roles, and other identity-related data in our database using Entity Framework Core and the Identity framework, and it will provide us with a set of endpoints to handle user registration, login, logout, and other identity-related operations out of the box. By using this method, we can save time and effort in setting up the necessary endpoints for user management and authentication in our application, and we can focus on implementing the core functionality of our application while still having robust user authentication and authorization features provided by the Identity framework. The "api" means that we will have to add "api" to the URL - //.../api/login (like all of our other endpoints)
+app.MapGroup("api").MapIdentityApi<User>();
 
 // The using keyword ensures that the scope is disposed of correctly after use.
 // This is important for managing the lifetime of services and ensuring that resources are released properly.
@@ -77,9 +100,10 @@ try
 {
     // Seed the database with initial data. The GetRequiredService method retrieves the AppDbContext instance from the service provider which gives us a connection to the database so we can seed it.
     var context = services.GetRequiredService<AppDbContext>();
+    var userManager = services.GetRequiredService<UserManager<User>>();
     // The MigrateAsync asynchronously applies any pending migrations for the context to the database. Will create the database if it does not already exist.
     await context.Database.MigrateAsync(); // Apply any pending migrations to the database. This ensures that the database schema is up to date before seeding data. In this way we don't have to manually run the migrations using CLI commands (dotnet ef database update...).
-    await DbInitializer.SeedData(context); // seed the database with initial data.
+    await DbInitializer.SeedData(context, userManager); // seed the database with initial data.
 }
 catch (Exception ex)
 {
