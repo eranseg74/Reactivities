@@ -1,4 +1,4 @@
-import { AccessTime, Place } from "@mui/icons-material";
+import { AccessTime, Place } from '@mui/icons-material';
 import {
   Avatar,
   Box,
@@ -9,9 +9,10 @@ import {
   Chip,
   Divider,
   Typography,
-} from "@mui/material";
-import { Link } from "react-router";
-import { formatDate } from "../../../lib/util/util";
+} from '@mui/material';
+import { Link } from 'react-router';
+import { formatDate } from '../../../lib/util/util';
+import type { Activity } from '../../../lib/types';
 
 type Props = {
   activity: Activity;
@@ -21,17 +22,17 @@ export default function ActivityCard({ activity }: Props) {
   const isHost = false; // Replace with actual logic to determine if the user is the host
   const isGoing = false; // Replace with actual logic to determine if the user is going
   const label = isHost
-    ? "You are hosting this activity"
-    : "You are going to this activity";
+    ? 'You are hosting this activity'
+    : 'You are going to this activity';
   const isCancelled = false; // Replace with actual logic to determine if the activity is cancelled
-  const color = isHost ? "secondary" : isGoing ? "warning" : "default";
+  const color = isHost ? 'secondary' : isGoing ? 'warning' : 'default';
   return (
     <Card elevation={3} sx={{ borderRadius: 3 }}>
       <Box display='flex' alignItems='center' justifyContent='space-between'>
         <CardHeader
           avatar={<Avatar sx={{ height: 80, width: 80 }} />}
           title={activity.title}
-          slotProps={{ title: { fontWeight: "bold", fontSize: 20 } }}
+          slotProps={{ title: { fontWeight: 'bold', fontSize: 20 } }}
           subheader={
             <>
               Hosted by <Link to={`/profies/bob`}>Bob</Link>
@@ -64,8 +65,7 @@ export default function ActivityCard({ activity }: Props) {
         <Box
           display='flex'
           gap={2}
-          sx={{ backgroundColor: "grey.200", py: 3, pl: 3 }}
-        >
+          sx={{ backgroundColor: 'grey.200', py: 3, pl: 3 }}>
           Attendees go here
         </Box>
       </CardContent>
@@ -77,11 +77,10 @@ export default function ActivityCard({ activity }: Props) {
           size='medium'
           variant='contained'
           sx={{
-            display: "flex",
-            justifySelf: "self-end",
+            display: 'flex',
+            justifySelf: 'self-end',
             borderRadius: 3,
-          }}
-        >
+          }}>
           View
         </Button>
       </CardContent>

@@ -73,3 +73,12 @@ export default defineConfig([
   },
 ])
 ```
+
+### Leaflet - Working with maps
+To work with leaflet in react first install the following:
+`npm install leaflet react-leaflet`
+React Leaflet provides TypeScript definitions in the installed packages, but needs Leaflet's definitions to be present. If you have not installed them yet, you will need to add them:
+`npm install -D @types/leaflet`
+
+Implementation in this project:
+1. Create a MapComponent.tsx (under the components folder)
