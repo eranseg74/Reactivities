@@ -1,12 +1,13 @@
-import axios from "axios";
-import { store } from "../stores/store";
-import { toast } from "react-toastify";
-import { router } from "../../app/router/Routes";
+import axios from 'axios';
+import { store } from '../stores/store';
+import { toast } from 'react-toastify';
+import { router } from '../../app/router/Routes';
 
 // This file will concentrate all the axios functionallity so it can be used all over the application
 // We will create an axios instance with the base URL of our API and we will use interceptors to switch the isLoading state in the store before and after the request is fired. This way we can show a loading spinner in the UI when the request is being processed and hide it when the response is received.
 const agent = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
+  withCredentials: true, // This is to allow sending cookies with the request. We need this because we are using cookie-based authentication in our API, and we want to include the authentication cookie in the requests from the client to the API. By setting withCredentials to true, we can ensure that the cookies are included in the requests, allowing us to maintain the user's authenticated session and access protected resources in the API.
 });
 
 const sleep = (delay: number) => {
@@ -52,14 +53,14 @@ agent.interceptors.response.use(
         }
         break;
       case 401:
-        toast.error("Unauthorized");
+        toast.error('Unauthorized');
         break;
       case 404:
-        router.navigate("/not-found");
+        router.navigate('/not-found');
         break;
       case 500:
         // We can pass as a second parameter to the navigate function an object with the state property that contains the error data. This way we can access the error data in the ServerError component and show it in the UI.
-        router.navigate("/server-error", { state: { error: data } });
+        router.navigate('/server-error', { state: { error: data } });
         break;
       default:
         break;

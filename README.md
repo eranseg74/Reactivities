@@ -243,3 +243,11 @@ Requires installation of 2 packages, mobx and mobx-react-lite - ```npm install m
 * __Action__: Functions that change state.
 * __Observer__: Components that update when observables change.
 * __Computed__: Values derived from state, cached automatically.
+
+### Protected routes in React
+We can "hide" routes from a user if he is not authorized to see the data on these pages / routes.
+Note that this is not a security authorization or validation. All of that is implemented in the server side! Otherwise the user would be able to pass it quite easy. This will just "hide" the routes.
+
+##### Step 1 - Create a dedicated file for the protected routes
+Create a file for the protected routes (RequireAuth.tsx in the routes folder)
+
