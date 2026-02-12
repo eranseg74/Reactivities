@@ -2,8 +2,10 @@ using API.Middleware;
 using Application.Activities.Queries;
 using Application.Activities.Validators;
 using Application.Core;
+using Application.Interfaces;
 using Domain;
 using FluentValidation;
+using Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -44,6 +46,8 @@ builder.Services.AddMediatR(cfg =>
     cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
 
+builder.Services.AddScoped<IUserAccessor, UserAccessor>(); // Defining it as a scoped service because it has to be scoped to the http request itself
+
 builder.Services.AddAutoMapper(cfg =>
 {
     cfg.LicenseKey = "eyJhbGciOiJSUzI1NiIsImtpZCI6Ikx1Y2t5UGVubnlTb2Z0d2FyZUxpY2Vuc2VLZXkvYmJiMTNhY2I1OTkwNGQ4OWI0Y2IxYzg1ZjA4ODNjZjkiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2x1Y2t5cGVubnlzb2Z0d2FyZS5jb20iLCJhdWQiOiJMdWNreVBlbm55U29mdHdhcmUiLCJleHAiOiIxODAxODcyMDAwIiwiaWF0IjoiMTc3MDM3Mzg1MyIsImFjY291bnRfaWQiOiIwMTljMzI3YzhlYTY3OTcyOTlmYzM0OTkwNjdjYTQwOCIsImN1c3RvbWVyX2lkIjoiY3RtXzAxa2dzODJjZXczODBlc2Y3ZWR4dmd5M3YxIiwic3ViX2lkIjoiLSIsImVkaXRpb24iOiIwIiwidHlwZSI6IjIifQ.0ykoDAmRgB5Y-euiUc1Lg5cmABPdgEQR8qMov-H81kS39K0G03EaC5pw4zLukZi-tICs0FBYbCfbp4S_TS2-OF0C1SfZjUrSf79UaNJBli4rvmMCKPJ17cJRIITngdzRHPM-694j3ZgnFxcMyq8wvqbGw9nXac4jgK_z0-32_kPAUhO8CovFWWvB1sSlbkBXFmA2VzE-h4MgSBJsPAr3McwSvA1iZ9eTzWHaQbnMCUeOUZaoUCprgzB7uvNslrLI6_zGjrxzdrAsZDQOjDs_ndqGZdhTNmmKnXqDZx624gEBbDzuW869u-Jj9m1j9fTVPBfZevYpuMa993zUkYqKbg";
@@ -61,6 +65,18 @@ builder.Services.AddIdentityApiEndpoints<User>(opt =>
 {
     opt.User.RequireUniqueEmail = true;
 }).AddRoles<IdentityRole>().AddEntityFrameworkStores<AppDbContext>();
+
+// Adding the authorization service for authorizing activities only as host
+// We use this policy when we want to update an activity because we want to enforce that only the host of an activity can update it
+builder.Services.AddAuthorization(opt =>
+{
+    opt.AddPolicy("IsActivityHost", policy =>
+    {
+        policy.Requirements.Add(new IsHostRequirement());
+    });
+});
+// The AddTransient method is used to register the IsHostRequirementHandler as a transient service for the IAuthorizationHandler interface. This means that a new instance of the IsHostRequirementHandler will be created each time it is requested. The IAuthorizationHandler interface is used by the authorization system to evaluate authorization requirements, and by registering our custom handler, we can implement the logic to check if a user is the host of an activity when the "IsActivityHost" policy is evaluated during authorization checks in our controllers.
+builder.Services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>();
 
 var app = builder.Build();
 

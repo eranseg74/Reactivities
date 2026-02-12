@@ -2,28 +2,27 @@
 
 #nullable disable
 
-namespace Persistence.Migrations
+namespace Persistence.Migrations;
+
+/// <inheritdoc />
+public partial class IsCancelledAdded : Migration
 {
     /// <inheritdoc />
-    public partial class IsCancelledAdded : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.AddColumn<bool>(
-                name: "IsCancelled",
-                table: "Activities",
-                type: "INTEGER",
-                nullable: false,
-                defaultValue: false);
-        }
+        migrationBuilder.AddColumn<bool>(
+            name: "IsCancelled",
+            table: "Activities",
+            type: "INTEGER",
+            nullable: false,
+            defaultValue: false);
+    }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropColumn(
-                name: "IsCancelled",
-                table: "Activities");
-        }
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.DropColumn(
+            name: "IsCancelled",
+            table: "Activities");
     }
 }

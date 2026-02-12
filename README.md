@@ -129,7 +129,20 @@ The steps for implementing the Fluent Validation component are as follows:
 10. Create a `HandleResult` method in the `BaseApiController` controller in order to provide a standardized way to handle the results returned by our handlers and convert them into appropriate HTTP responses.
 11. Wrap the returned responses in the controllers with the `HandleResult` method.
 
+### EF Relationship
+In the project there is a relation of many to many between the activities and the users. A user can attend to many acticities and an activity can contain many users.
+To handle this we define the relation in the User and Activity entities and EF will automatically generate a third table that will contain 2 primary keys (one for the user and one for the activity) and add foreign keys to the Activity and User entities. So, instead of many to many between the users and activities there will be a connection of one to many between the activities table and the new joined table (every activity in the activities table might have multiple users in the new joined table), and a connection of one to many between the users table and the new joined table (every user in the users table might have multiple activities in the new joined table).
+This is accomplished by defining navigation properties on the relevant entities.
 
+### Adding a new project
+In the backend we added the Infrastructure layer (project). This was done via the `dotnet new classlib -n Infrastructure` command.
+To see the project in our solution we added it to the solution: `dotnet solution add Infrastructure`
+After creating the new project we define its relation to the other projects. The Infrastructure layer has a dependency on the Application layer by right-clicking on the Infastructure folder in the EXPLORER menu on the left and selecting the `Add project reference` and selecting the `Application` option.
+We also added a reference in the `API` layer to the `Infrastructure` layer.
+The reason for that is that we do not want to implement the access to the user properties in the `Application` layer because it is not suppose to know about it (it is implemented in the `API` layer). So, we define only the interfaces in the `Application` layer and the implementation is done in the `Infrastructure` layer. Because the `Infrastructure` is implementing interfaces from the `Application` layer, the `Infrastructure` has a dependency on the `Application` layer.
+Since the `API` is also the startup project we define the dependeny container in that project (in the `Program.cs` file) so the `API` also has a dependency on the `Infrastructure`. We define the dependency the same way described above between the `Application` and the `Infrastructure` layers, by adding a project reference to the `API` and selecting the `Infrastructure` layer.
+After creating the interface (in the `Application` layer) and the implementation class (in the `Infrastructure` layer) we add them as a service the `Program.cs` (in the `API` layer) file as a scoped service because we need it to be scoped to the http request.
+Finally we can implement it in the required commands (such as in the `CreateActivity.cs` because we want to define that each user that creates an activity is automatically the host of that activity)
 
 # -----------------------------------------------------------------------------------------------------------------
 ## FRONTEND - REACT

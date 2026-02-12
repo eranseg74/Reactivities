@@ -1,9 +1,8 @@
 using System;
 
-namespace Application.Activities.DTOs
+namespace Application.Activities.DTOs;
+
+public class EditActivityDto : BaseActivityDto
 {
-    public class EditActivityDto : BaseActivityDto
-    {
-        public string Id { get; set; } = string.Empty;
-    }
+    public string Id { get; set; } = string.Empty;
 }

@@ -8,57 +8,56 @@ using Persistence;
 
 #nullable disable
 
-namespace Persistence.Migrations
+namespace Persistence.Migrations;
+
+[DbContext(typeof(AppDbContext))]
+[Migration("20260205203212_InitialCreate")]
+partial class InitialCreate
 {
-    [DbContext(typeof(AppDbContext))]
-    [Migration("20260205203212_InitialCreate")]
-    partial class InitialCreate
+    /// <inheritdoc />
+    protected override void BuildTargetModel(ModelBuilder modelBuilder)
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
-        {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "10.0.2");
+        modelBuilder.HasAnnotation("ProductVersion", "10.0.2");
 
-            modelBuilder.Entity("Domain.Activity", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("TEXT");
+        modelBuilder.Entity("Domain.Activity", b =>
+            {
+                b.Property<string>("Id")
+                    .HasColumnType("TEXT");
 
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                b.Property<string>("Category")
+                    .IsRequired()
+                    .HasColumnType("TEXT");
 
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                b.Property<string>("City")
+                    .IsRequired()
+                    .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("TEXT");
+                b.Property<DateTime>("Date")
+                    .HasColumnType("TEXT");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                b.Property<string>("Description")
+                    .IsRequired()
+                    .HasColumnType("TEXT");
 
-                    b.Property<double>("Latitude")
-                        .HasColumnType("REAL");
+                b.Property<double>("Latitude")
+                    .HasColumnType("REAL");
 
-                    b.Property<double>("Longitude")
-                        .HasColumnType("REAL");
+                b.Property<double>("Longitude")
+                    .HasColumnType("REAL");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                b.Property<string>("Title")
+                    .IsRequired()
+                    .HasColumnType("TEXT");
 
-                    b.Property<string>("Venue")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                b.Property<string>("Venue")
+                    .IsRequired()
+                    .HasColumnType("TEXT");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.ToTable("Activities");
-                });
+                b.ToTable("Activities");
+            });
 #pragma warning restore 612, 618
-        }
     }
 }
