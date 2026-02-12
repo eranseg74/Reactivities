@@ -1,10 +1,10 @@
-import { Typography, Grid } from "@mui/material";
-import { useParams } from "react-router";
-import { useActivities } from "../../../lib/hooks/useActivities";
-import ActivityDetailsHeader from "./ActivityDetailsHeader";
-import ActivityDetailsInfo from "./ActivityDetailsInfo";
-import ActivityDetailsChat from "./ActivityDetailsChat";
-import ActivityDetailsSidebar from "./ActivityDetailsSidebar";
+import { Typography, Grid } from '@mui/material';
+import { useParams } from 'react-router';
+import { useActivities } from '../../../lib/hooks/useActivities';
+import ActivityDetailsHeader from './ActivityDetailsHeader';
+import ActivityDetailsInfo from './ActivityDetailsInfo';
+import ActivityDetailsChat from './ActivityDetailsChat';
+import ActivityDetailsSidebar from './ActivityDetailsSidebar';
 
 export default function ActivityDetailPage() {
   const { id } = useParams(); // useParams is a hook that allows us to access the parameters of the current route. In this case, we are using it to access the id parameter from the URL. This id will be used to fetch the details of the specific activity that we want to display. The useParams hook returns an object with key-value pairs, where the keys are the names of the parameters defined in the route and the values are the corresponding values from the URL. By destructuring the id from the object returned by useParams, we can easily access it and use it in our component to fetch the activity details or perform any other operations that require the id.
@@ -19,7 +19,7 @@ export default function ActivityDetailPage() {
         <ActivityDetailsChat />
       </Grid>
       <Grid size={4}>
-        <ActivityDetailsSidebar />
+        <ActivityDetailsSidebar activity={activity} />
       </Grid>
     </Grid>
   );

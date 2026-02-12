@@ -1,31 +1,35 @@
-import { Card, Badge, CardMedia, Box, Typography, Button } from "@mui/material";
-import { Link } from "react-router";
-import { formatDate } from "../../../lib/util/util";
+import { Card, CardMedia, Box, Typography, Chip } from '@mui/material';
+import { Link } from 'react-router';
+import { formatDate } from '../../../lib/util/util';
+import { useActivities } from '../../../lib/hooks/useActivities';
+import StyledButton from '../../../app/shared/components/StyledButton';
 
 type Props = {
   activity: Activity;
 };
 
 export default function ActivityDetailsHeader({ activity }: Props) {
-  const isCancelled = false;
-  const isHost = true;
-  const isGoing = true;
-  const loading = false;
+  const { updateAttendance } = useActivities(activity.id);
 
   return (
     <Card
       sx={{
-        position: "relative",
+        position: 'relative',
         mb: 2,
-        backgroundColor: "transparent",
-        overflow: "hidden",
-      }}
-    >
-      {isCancelled && (
-        <Badge
-          sx={{ position: "absolute", left: 40, top: 20, zIndex: 1000 }}
+        backgroundColor: 'transparent',
+        overflow: 'hidden',
+      }}>
+      {activity.isCancelled && (
+        <Chip
+          sx={{
+            position: 'absolute',
+            left: 40,
+            top: 20,
+            zIndex: 1000,
+            borderRadius: 1,
+          }}
           color='error'
-          badgeContent='Cancelled'
+          label='Cancelled'
         />
       )}
       <CardMedia
@@ -36,69 +40,68 @@ export default function ActivityDetailsHeader({ activity }: Props) {
       />
       <Box
         sx={{
-          position: "absolute",
+          position: 'absolute',
           bottom: 0,
-          width: "100%",
-          color: "white",
+          width: '100%',
+          color: 'white',
           padding: 2,
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "flex-end",
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'flex-end',
           background:
-            "linear-gradient(to top, rgba(0, 0, 0, 1.0), transparent)",
-          boxSizing: "border-box",
-        }}
-      >
+            'linear-gradient(to top, rgba(0, 0, 0, 1.0), transparent)',
+          boxSizing: 'border-box',
+        }}>
         {/* Text Section */}
         <Box>
-          <Typography variant='h4' sx={{ fontWeight: "bold" }}>
+          <Typography variant='h4' sx={{ fontWeight: 'bold' }}>
             {activity.title}
           </Typography>
           <Typography variant='subtitle1'>
             {formatDate(activity.date)}
           </Typography>
           <Typography variant='subtitle2'>
-            Hosted by{" "}
+            Hosted by{' '}
             <Link
-              to={`/profiles/username`}
-              style={{ color: "white", fontWeight: "bold" }}
-            >
-              Bob
+              to={`/profiles/${activity.hostId}`}
+              style={{ color: 'white', fontWeight: 'bold' }}>
+              {activity.hostDisplayName}
             </Link>
           </Typography>
         </Box>
 
         {/* Buttons aligned to the right */}
-        <Box sx={{ display: "flex", gap: 2 }}>
-          {isHost ? (
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          {activity.isHost ? (
             <>
-              <Button
+              <StyledButton
                 variant='contained'
-                color={isCancelled ? "success" : "error"}
-                onClick={() => {}}
-              >
-                {isCancelled ? "Re-activate Activity" : "Cancel Activity"}
-              </Button>
-              <Button
+                color={activity.isCancelled ? 'success' : 'error'}
+                disabled={updateAttendance.isPending}
+                loading={updateAttendance.isPending}
+                onClick={() => updateAttendance.mutate(activity.id)}>
+                {activity.isCancelled
+                  ? 'Re-activate Activity'
+                  : 'Cancel Activity'}
+              </StyledButton>
+              <StyledButton
                 variant='contained'
                 color='primary'
                 component={Link}
                 to={`/manage/${activity.id}`}
-                disabled={isCancelled}
-              >
+                disabled={activity.isCancelled}>
                 Manage Event
-              </Button>
+              </StyledButton>
             </>
           ) : (
-            <Button
+            <StyledButton
               variant='contained'
-              color={isGoing ? "primary" : "info"}
-              onClick={() => {}}
-              disabled={isCancelled || loading}
-            >
-              {isGoing ? "Cancel Attendance" : "Join Activity"}
-            </Button>
+              color={activity.isGoing ? 'primary' : 'info'}
+              onClick={() => updateAttendance.mutate(activity.id)}
+              disabled={activity.isCancelled || updateAttendance.isPending}>
+              {activity.isGoing ? 'Cancel Attendance' : 'Join Activity'}
+            </StyledButton>
           )}
         </Box>
       </Box>
