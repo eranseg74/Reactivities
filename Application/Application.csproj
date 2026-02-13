@@ -11,6 +11,11 @@
     <ProjectReference Include="../Persistence/Persistence.csproj" />
   </ItemGroup>
 
+  <!-- Note! Since the Application was created as a class library it does not have access to all of the framework services so we need to add the following framework reference which will give us access to these services -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="16.0.0" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
@@ -26,7 +31,9 @@
     <Folder Include="Core/" />
     <Folder Include="Interfaces/" />
     <Folder Include="Profiles/" />
+    <Folder Include="Profiles/Commands/" />
     <Folder Include="Profiles/DTOs/" />
+    <Folder Include="Profiles/Queries/" />
   </ItemGroup>
 
 </Project>

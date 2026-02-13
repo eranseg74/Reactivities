@@ -41,5 +41,6 @@ public class MappingProfiles : Profile
         CreateMap<Activity, ActivityDto>().ForMember(d => d.HostDisplayName, o => o.MapFrom(s => s.Attendees.FirstOrDefault(x => x.IsHost)!.User.DisplayName));
         CreateMap<Activity, ActivityDto>().ForMember(d => d.HostId, o => o.MapFrom(s => s.Attendees.FirstOrDefault(x => x.IsHost)!.User.Id));
         */
+        CreateMap<User, UserProfile>();
     }
 }

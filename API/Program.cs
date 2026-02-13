@@ -5,6 +5,7 @@ using Application.Core;
 using Application.Interfaces;
 using Domain;
 using FluentValidation;
+using Infrastructure.Photos;
 using Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -46,7 +47,9 @@ builder.Services.AddMediatR(cfg =>
     cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
 
-builder.Services.AddScoped<IUserAccessor, UserAccessor>(); // Defining it as a scoped service because it has to be scoped to the http request itself
+// Defining it as a scoped service because it has to be scoped to the http request itself
+builder.Services.AddScoped<IUserAccessor, UserAccessor>();
+builder.Services.AddScoped<IPhotoService, PhotoService>();
 
 builder.Services.AddAutoMapper(cfg =>
 {
@@ -77,6 +80,9 @@ builder.Services.AddAuthorization(opt =>
 });
 // The AddTransient method is used to register the IsHostRequirementHandler as a transient service for the IAuthorizationHandler interface. This means that a new instance of the IsHostRequirementHandler will be created each time it is requested. The IAuthorizationHandler interface is used by the authorization system to evaluate authorization requirements, and by registering our custom handler, we can implement the logic to check if a user is the host of an activity when the "IsActivityHost" policy is evaluated during authorization checks in our controllers.
 builder.Services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>();
+
+// Configure the CloudinarySettings class to be used for dependency injection. This will allow us to inject the CloudinarySettings class into our services and controllers to access the Cloudinary configuration settings defined in the appsettings.json file. The Configure method is used to bind the CloudinarySettings class to the corresponding section in the configuration file, which allows us to easily access these settings throughout our application using dependency injection.
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 
 var app = builder.Build();
 

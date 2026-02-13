@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Domain;
-using Microsoft.VisualBasic;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
@@ -16,6 +15,7 @@ public class AppDbContext(DbContextOptions options) : IdentityDbContext<User>(op
     // The EntityFramework uses the DbSet<T> properties to know which entities we want to include in the model. Each DbSet<T> property corresponds to a table in the database, and the type parameter T represents the entity type that will be stored in that table. The name of the DbSet<T> property is used as the name of the table in the database (Activities in this case) unless we specify a different name using data annotations or Fluent API configurations. It will look at the Activity class to determine the columns and their types in the Activities table.
     public required DbSet<Activity> Activities { get; set; }
     public required DbSet<ActivityAttendee> ActivityAttendees { get; set; }
+    public required DbSet<Photo> Photos { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

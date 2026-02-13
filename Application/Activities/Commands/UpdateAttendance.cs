@@ -1,6 +1,5 @@
 using Application.Core;
 using Application.Interfaces;
-using AutoMapper;
 using Domain;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -28,7 +27,7 @@ public class UpdateAttendance
                 return Result<Unit>.Failure("Activity not found", 404);
             }
             var user = await userAccessor.GetUserAsync(); // Fetching the current user data
-            // Checking if the current user is attending in the fetched activity:
+                                                          // Checking if the current user is attending in the fetched activity:
             var attendance = activity.Attendees.FirstOrDefault(x => x.UserId == user.Id);
             // Checking if the current user is the host of the activity.
             var isHost = activity.Attendees.Any(x => x.IsHost && x.UserId == user.Id);

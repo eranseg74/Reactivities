@@ -264,3 +264,25 @@ Note that this is not a security authorization or validation. All of that is imp
 ##### Step 1 - Create a dedicated file for the protected routes
 Create a file for the protected routes (RequireAuth.tsx in the routes folder)
 
+# -----------------------------------------------------------------------------------------------------------------
+## FILE STORAGE - CLAUDINARY
+# -----------------------------------------------------------------------------------------------------------------
+
+To use Claudinary we need:
+1. Install the `CloudinaryDotNet @Cloudinary` __Nuget__ package (In this case we define it in the `Infrastructure` project)
+2. Define a `CloudinarySettings` section in the `appsettings.json` file (excluded from GitHub) and define the following properties in this section:
+   1. The product environment name (cloud name)
+   2. The API key
+   3. The API secret key
+3. Create a `CloudinarySettings` class with these 3 properties as strings. Make sure the names of the properties are exacly like the names in the `appsettings.json` file
+4. Add a configuration in the `Program.cs` class that defines the `CloudinarySettings.cs` class as a service so it will be valid for injection in our other services or controllers.
+5. Create a DTO to store whatever comes back from Cloudinary (in the `Application/Profiles/DTOs` folder).
+6. Add the following to get access to the Http framework service:
+   ```C#
+   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  ```
+7. The implemented structure will be implementing an interface in the `Application` layer and the interface implementation in the `Interface` layer which will communicate with `Cloudinary`. This way we are not creating any dependency between our application and the storage provider (Cloudinary in this case).
+8. After creating the interface and the implementation class - add them as a scoped sercive to the `Program.cs` file.
+
