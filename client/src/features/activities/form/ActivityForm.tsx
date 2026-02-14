@@ -48,7 +48,7 @@ export default function ActivityForm() {
     try {
       if (activity) {
         updateActivity.mutate(
-          { ...activity, ...flattenedData },
+          { ...activity, ...flattenedData } as unknown as Activity,
           {
             onSuccess: () => {
               navigate(`/activities/${activity.id}`);
@@ -56,7 +56,7 @@ export default function ActivityForm() {
           },
         );
       } else {
-        createActivity.mutate(flattenedData, {
+        createActivity.mutate(flattenedData as unknown as Activity, {
           onSuccess: (id) => {
             navigate(`/activities/${id}`);
           },

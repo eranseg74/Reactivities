@@ -6,4 +6,4 @@ export function formatDate(date: DateArg<Date>) {
 }
 
 export const requiredString = (fieldName: string) =>
-  z.string({ error: `${fieldName} is required` });
+  z.string().min(1, { error: `${fieldName} is required` });

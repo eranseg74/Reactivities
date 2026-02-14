@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import agent from '../api/agent';
 import { useMemo } from 'react';
+import type { EditProfileSchema } from '../schemas/editProfileSchema';
 
 export const useProfile = (id?: string) => {
   const queryClient = useQueryClient();
@@ -56,7 +57,7 @@ export const useProfile = (id?: string) => {
     mutationFn: async (photo: Photo) => {
       await agent.put(`/profiles/${photo.id}/setMain`);
     },
-    // The first argument is the data received from the AIP (which we do not need so we placed the _ sign).
+    // The first argument is the data received from the API (which we do not need so we placed the _ sign).
     // The second argument is the variables passed to the mutation function (in this case - the photo itself).
     // This way, on success we have access to the variables sent to the API call + the API response.
     /* Non optimistic approach:
@@ -136,6 +137,52 @@ export const useProfile = (id?: string) => {
     },
   });
 
+  const editProfile = useMutation({
+    mutationFn: async (formData: EditProfileSchema) => {
+      await agent.put('/profiles', formData);
+    },
+    onMutate: async (formData: EditProfileSchema) => {
+      // Cancel all ongoing queries on the current user's profile
+      await queryClient.cancelQueries({ queryKey: ['profile', id] });
+
+      // Getting the current data on the user and profile from the cache
+      const prevProfile = queryClient.getQueryData<Profile>(['profile', id]);
+      const prevUser = queryClient.getQueryData<User>(['user']);
+
+      // Setting the data in the cache for both the user and the profile
+      queryClient.setQueryData<Profile>(['profile', id], (oldProfile) => {
+        if (!oldProfile) {
+          return oldProfile;
+        }
+        return {
+          ...oldProfile,
+          displayName: formData.displayName,
+          bio: formData.bio,
+        };
+      });
+      queryClient.setQueryData<User>(['user'], (userData) => {
+        if (!userData) {
+          return userData;
+        }
+        return {
+          ...userData,
+          displayName: formData.displayName,
+        };
+      });
+      // Returning the current (not updated) user and profile in case of update failure.
+      return { prevProfile, prevUser };
+    },
+    onError: (error, profileId, context) => {
+      console.log(error);
+      if (context?.prevProfile) {
+        queryClient.setQueryData(['profiles', profileId], context.prevProfile);
+      }
+      if (context?.prevUser) {
+        queryClient.setQueryData(['user'], context.prevUser);
+      }
+    },
+  });
+
   // Determine if the profile being viewed belongs to the current user. The useMemo hook is used to optimize performance by memoizing the result, so it only recalculates when the id or queryClient changes.
   // The ['user'] query is assumed to hold the current user's data, and we compare the id from the profile being viewed with the id of the current user to determine if they are the same. This is useful for conditionally rendering certain UI elements or allowing specific actions (like editing the profile) only if the user is viewing their own profile. The ['user'] comes from the query cache, which is managed by React Query, and it should have been set somewhere else in the application when the user logged in or their data was fetched.
   const isCurrentUser = useMemo(() => {
@@ -151,5 +198,6 @@ export const useProfile = (id?: string) => {
     uploadPhoto,
     setMainPhoto,
     deletePhoto,
+    editProfile,
   };
 };

@@ -87,7 +87,15 @@ export default function ActivityCard({ activity }: Props) {
         </Box>
       </CardContent>
       <CardContent sx={{ pb: 2 }}>
-        <Typography variant='body2'>{activity.description}</Typography>
+        <Typography
+          variant='body2'
+          sx={{
+            textOverflow: 'ellipsis',
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+          }}>
+          {activity.description}
+        </Typography>
         <Button
           component={Link}
           to={`/activities/${activity.id}`}
