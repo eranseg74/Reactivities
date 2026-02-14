@@ -42,5 +42,11 @@ public class MappingProfiles : Profile
         CreateMap<Activity, ActivityDto>().ForMember(d => d.HostId, o => o.MapFrom(s => s.Attendees.FirstOrDefault(x => x.IsHost)!.User.Id));
         */
         CreateMap<User, UserProfile>();
+
+        // The Id, Body, and CreateAt are identical in both the Comment and the CommentDto and are not navigation properties so there is no need to specify them.
+        CreateMap<Comment, CommentDto>()
+            .ForMember(d => d.DisplayName, o => o.MapFrom(s => s.User.DisplayName))
+            .ForMember(d => d.UserId, o => o.MapFrom(s => s.User.Id))
+            .ForMember(d => d.ImageUrl, o => o.MapFrom(s => s.User.ImageUrl));
     }
 }

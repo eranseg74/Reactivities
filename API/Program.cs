@@ -1,4 +1,5 @@
 using API.Middleware;
+using API.SignalR;
 using Application.Activities.Queries;
 using Application.Activities.Validators;
 using Application.Core;
@@ -37,6 +38,9 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 // Returns: The IServiceCollection so that additional calls can be chained.
 // Requires also setting in the middleware section below
 builder.Services.AddCors();
+
+// Adding the SignalR service
+builder.Services.AddSignalR();
 
 // Adding MediatR to the service collection to enable the mediator pattern in the application. The RegisterServicesFromAssemblyContaining method is used to register all the handlers, requests, and notifications defined in the specified assembly. In this case, we are registering the services from the assembly that contains the GetActivityList.Handler class.
 builder.Services.AddMediatR(cfg =>
@@ -109,6 +113,9 @@ app.MapControllers(); // This is the line that tells the API to use the controll
 
 // Mapping the API Identity endpoint. This will automatically create endpoints for user registration, login, logout, and other identity-related operations based on the Identity framework. By mapping these endpoints, we can easily manage user authentication and authorization in our application without having to manually create these endpoints ourselves. The MapIdentityApi method is a convenient way to set up the necessary endpoints for user management and authentication using the Identity framework. We specify the type of the user as User, which is our custom user class that inherits from IdentityUser. This will allow us to manage users, roles, and other identity-related data in our database using Entity Framework Core and the Identity framework, and it will provide us with a set of endpoints to handle user registration, login, logout, and other identity-related operations out of the box. By using this method, we can save time and effort in setting up the necessary endpoints for user management and authentication in our application, and we can focus on implementing the core functionality of our application while still having robust user authentication and authorization features provided by the Identity framework. The "api" means that we will have to add "api" to the URL - //.../api/login (like all of our other endpoints)
 app.MapGroup("api").MapIdentityApi<User>();
+
+// Add the SignalR middlware in order to tell the `API` server where to send the requests that are comming to a particular endpoint as our `SignalR` endpoint
+app.MapHub<CommentHub>("/comments");
 
 // The using keyword ensures that the scope is disposed of correctly after use.
 // This is important for managing the lifetime of services and ensuring that resources are released properly.

@@ -12,6 +12,7 @@ type Props<T extends FieldValues> = {} & UseControllerProps<T> & TextFieldProps;
 
 export default function TextInput<T extends FieldValues>(props: Props<T>) {
   const { field, fieldState } = useController({ ...props }); // This hook connects the TextField to the form state and validation. It returns an object with two properties: field, which contains the props that need to be passed to the TextField component to connect it to the form, and fieldState, which contains information about the validation state of the field, such as whether there are any errors. The props passed to the useController hook include all the props for the useController hook, which are specified in the Props type, as well as any additional props that are passed to the TextInput component when it is used.
+  console.log(props);
   return (
     <TextField
       {...field}

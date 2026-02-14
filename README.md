@@ -286,3 +286,25 @@ To use Claudinary we need:
 7. The implemented structure will be implementing an interface in the `Application` layer and the interface implementation in the `Interface` layer which will communicate with `Cloudinary`. This way we are not creating any dependency between our application and the storage provider (Cloudinary in this case).
 8. After creating the interface and the implementation class - add them as a scoped sercive to the `Program.cs` file.
 
+# -----------------------------------------------------------------------------------------------------------------
+## SignalR
+# -----------------------------------------------------------------------------------------------------------------
+
+### Steps of implementation (in this project)
+
+##### Server Side
+1. Create a `Comment` entity with navigation properties to the user (`User` + `UserId`) and activity (`Activity` + `ActivityId`).
+2. Add a collect of comments to the `Activity` entity (No need to add it to the `User` entity since we will not need a view where it will be required to see all the comments of a user).
+3. Add the appropriate `DbSet` in the `AppDbContext` class.
+4. Create a `CommentDto` class in order to send the required data to the client.
+5. Create a mapping from the `Comment` to the `CommentDto` in the `mappingProfiles.cs` class.
+6. Create a `Handler` to create a `Comment`, and another `Handler` for getting all the comments of a specific activity.
+7. Create the SignalR hub. In this case it will be thr `CommentHub`.
+8. Add the `SignalR` as a service in the `Program.cs` class.
+9. Add the `SignalR` as a middleware in order to tell the `API` server where to send the requests that are comming to a particular endpoint as our `SignalR` endpoint. Also in the `Program.cs` class.
+
+##### Client Side
+1. Install the signalr package: `npm install @microsoft/signalr`.
+2. Add a `ChatComment` type in the `index.d.ts` file.
+3. Add to the `.env.development` file the comments URL: `VITE_COMMENT_URL=https://localhost:5001/comments`. Important!!! The `/comments` at the end must match the path defined in the `MapHub` in the `Program.cs` class (`app.MapHub<CommentHub>("/comments");`). Otherwise this will not work.
+4. Create a hook (`useComments`) that will provide the ability to create and stop connections because we want this ability only in the chat component.
