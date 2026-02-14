@@ -22,10 +22,12 @@ export const useActivities = (id?: string) => {
     enabled: !id && location.pathname === '/activities' && !!currentUser,
     select: (data) => {
       return data.map((activity) => {
+        const host = activity.attendees.find((x) => x.id === activity.hostId);
         return {
           ...activity,
           isHost: currentUser?.id === activity.hostId,
           isGoing: activity.attendees.some((x) => x.id === currentUser?.id),
+          hostImageUrl: host?.imageUrl,
         };
       });
     },
@@ -42,10 +44,12 @@ export const useActivities = (id?: string) => {
     // The enabled property is used to conditionally enable or disable the query. In this case, we only want to fetch the activity if the id is provided. If the id is not provided, the query will be disabled and will not run. This is useful to prevent unnecessary API calls when we don't have the necessary information to fetch the data. Otherswise, if we don't use the enabled property, the query will run multiple times even when the id is not provided, which will result in an error because the API endpoint requires an id to fetch a specific activity. The !! operator is used to convert the id to a boolean value. If the id is a non-empty string, it will be truthy and the query will be enabled. If the id is an empty string or undefined, it will be falsy and the query will be disabled. This way, we ensure that the query only runs when we have a valid id to fetch the activity. This is particularly useful in scenarios where we might be rendering a component that relies on an id that may not be immediately available, such as when navigating to a details page for an activity. By using the enabled property, we can prevent unnecessary API calls and handle loading states more effectively.
     enabled: !!id && !!currentUser,
     select: (data) => {
+      const host = data.attendees.find((x) => x.id === data.hostId);
       return {
         ...data,
         isHost: currentUser?.id === data.hostId,
         isGoing: data.attendees.some((x) => x.id === currentUser?.id),
+        hostImageUrl: host?.imageUrl,
       };
     },
   });
@@ -100,6 +104,7 @@ export const useActivities = (id?: string) => {
         activityId,
       ]);
 
+      // The setQueryData function is used to update the cached data for a specific query. It accepts two arguments: the queryKey and an updater function. The queryKey is an array that identifies the query we want to update, and the updater function receives the current cached data as an argument and returns the new data that we want to cache. In this case, we are updating the activity in the cache by toggling the isCancelled property if the current user is the host, and by adding or removing the current user from the attendees array based on whether they are currently attending or not. This allows us to optimistically update the UI before the mutation is completed, providing a better user experience.
       queryClient.setQueryData<Activity>(
         ['activities', activityId],
         (oldActivity) => {
@@ -132,6 +137,7 @@ export const useActivities = (id?: string) => {
       );
       return { prevActivity };
     },
+    // If the mutation fails, we want to roll back to the previous state of the activity. The onError function is called when the mutation fails, and it receives the error, the variables passed to the mutationFn, and the context returned from the onMutate function. In this case, we check if there is a prevActivity in the context, and if there is, we set the query data for the activity back to the prevActivity, effectively rolling back to the previous state of the activity before the optimistic update was applied.
     onError: (error, activityId, context) => {
       console.log(error);
       if (context?.prevActivity) {

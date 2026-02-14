@@ -5,20 +5,19 @@ import {
   CardContent,
   TextField,
   Avatar,
-} from "@mui/material";
-import { Link } from "react-router";
+} from '@mui/material';
+import { Link } from 'react-router';
 
 export default function ActivityDetailsChat() {
   return (
     <>
       <Box
         sx={{
-          textAlign: "center",
-          bgcolor: "primary.main",
-          color: "white",
+          textAlign: 'center',
+          bgcolor: 'primary.main',
+          color: 'white',
           padding: 2,
-        }}
-      >
+        }}>
         <Typography variant='h6'>Chat about this event</Typography>
       </Box>
       <Card>
@@ -36,10 +35,10 @@ export default function ActivityDetailsChat() {
           </div>
 
           <Box>
-            <Box sx={{ display: "flex", my: 2 }}>
+            <Box sx={{ display: 'flex', my: 2 }}>
               <Avatar
-                src={"/images/user.png"}
-                alt={"user image"}
+                src={'/images/user.png'}
+                alt={'user image'}
                 sx={{ mr: 2 }}
               />
               <Box display='flex' flexDirection='column'>
@@ -48,8 +47,7 @@ export default function ActivityDetailsChat() {
                     component={Link}
                     to={`/profiles/username`}
                     variant='subtitle1'
-                    sx={{ fontWeight: "bold", textDecoration: "none" }}
-                  >
+                    sx={{ fontWeight: 'bold', textDecoration: 'none' }}>
                     Bob
                   </Typography>
                   <Typography variant='body2' color='textSecondary'>
@@ -57,7 +55,7 @@ export default function ActivityDetailsChat() {
                   </Typography>
                 </Box>
 
-                <Typography sx={{ whiteSpace: "pre-wrap" }}>
+                <Typography sx={{ whiteSpace: 'pre-wrap' }}>
                   Comment goes here
                 </Typography>
               </Box>
