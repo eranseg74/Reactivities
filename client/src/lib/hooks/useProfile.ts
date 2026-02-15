@@ -3,7 +3,7 @@ import agent from '../api/agent';
 import { useMemo } from 'react';
 import type { EditProfileSchema } from '../schemas/editProfileSchema';
 
-export const useProfile = (id?: string) => {
+export const useProfile = (id?: string, predicate?: string) => {
   const queryClient = useQueryClient();
   const { data: profile, isLoading: loadingProfile } = useQuery<Profile>({
     queryKey: ['profile', id],
@@ -11,7 +11,7 @@ export const useProfile = (id?: string) => {
       const response = await agent.get<Profile>(`/profiles/${id}`);
       return response.data;
     },
-    enabled: !!id, // Only run the query if id is provided
+    enabled: !!id && !predicate, // Only run the query if id is provided
   });
 
   const { data: photos, isLoading: loadingPhotos } = useQuery<Photo[]>({
@@ -20,7 +20,20 @@ export const useProfile = (id?: string) => {
       const response = await agent.get<Photo[]>(`/profiles/${id}/photos`);
       return response.data;
     },
-    enabled: !!id, // Only run the query if id is provided
+    enabled: !!id && !predicate, // Only run the query if id is provided and the predicate is not provided
+  });
+
+  const { data: followings, isLoading: loadingFollowings } = useQuery<
+    Profile[]
+  >({
+    queryKey: ['followings', id, predicate],
+    queryFn: async () => {
+      const response = await agent.get<Profile[]>(
+        `/profiles/${id}/follow-list?predicate=${predicate}`,
+      );
+      return response.data;
+    },
+    enabled: !!id && !!predicate,
   });
 
   const uploadPhoto = useMutation({
@@ -118,7 +131,7 @@ export const useProfile = (id?: string) => {
     onError: (error, profileId, context) => {
       console.log(error);
       if (context?.prevProfile) {
-        queryClient.setQueryData(['profiles', profileId], context.prevProfile);
+        queryClient.setQueryData(['profile', profileId], context.prevProfile);
       }
       if (context?.prevUser) {
         queryClient.setQueryData(['user'], context?.prevUser);
@@ -183,6 +196,31 @@ export const useProfile = (id?: string) => {
     },
   });
 
+  const updateFollowing = useMutation({
+    mutationFn: async () => {
+      await agent.post(`/profiles/${id}/follow`);
+    },
+    onSuccess: () => {
+      queryClient.setQueryData(['profile', id], (profile: Profile) => {
+        // We also invalidate the data in the cache with the followings key so the list of photos will automatically update when the user clicks on the Follow / Unfollow button
+        queryClient.invalidateQueries({
+          queryKey: ['followings', id, 'followers'],
+        });
+        if (!profile || profile.followersCount === undefined) {
+          // 0 is also true so we need to check if undefined
+          return profile;
+        }
+        return {
+          ...profile,
+          following: !profile.following,
+          followersCount: profile.following
+            ? profile.followersCount - 1
+            : profile.followersCount + 1,
+        };
+      });
+    },
+  });
+
   // Determine if the profile being viewed belongs to the current user. The useMemo hook is used to optimize performance by memoizing the result, so it only recalculates when the id or queryClient changes.
   // The ['user'] query is assumed to hold the current user's data, and we compare the id from the profile being viewed with the id of the current user to determine if they are the same. This is useful for conditionally rendering certain UI elements or allowing specific actions (like editing the profile) only if the user is viewing their own profile. The ['user'] comes from the query cache, which is managed by React Query, and it should have been set somewhere else in the application when the user logged in or their data was fetched.
   const isCurrentUser = useMemo(() => {
@@ -199,5 +237,8 @@ export const useProfile = (id?: string) => {
     setMainPhoto,
     deletePhoto,
     editProfile,
+    updateFollowing,
+    followings,
+    loadingFollowings,
   };
 };

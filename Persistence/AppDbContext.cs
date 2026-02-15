@@ -17,6 +17,7 @@ public class AppDbContext(DbContextOptions options) : IdentityDbContext<User>(op
     public required DbSet<ActivityAttendee> ActivityAttendees { get; set; }
     public required DbSet<Photo> Photos { get; set; }
     public required DbSet<Comment> Comments { get; set; }
+    public required DbSet<UserFollowing> UserFollowings { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -26,6 +27,25 @@ public class AppDbContext(DbContextOptions options) : IdentityDbContext<User>(op
 
         builder.Entity<ActivityAttendee>().HasOne(x => x.User).WithMany(x => x.Activities).HasForeignKey(x => x.UserId);
         builder.Entity<ActivityAttendee>().HasOne(x => x.Activity).WithMany(x => x.Attendees).HasForeignKey(x => x.ActivityId);
+
+        // Configuring the relation for the UserFollowings
+        builder.Entity<UserFollowing>(x =>
+        {
+            // Sets the property that make up the primary key for this entity type. In this case it is a combination of the ObserverId and the TargetId.
+            x.HasKey(k => new { k.ObserverId, k.TargetId });
+
+            // Configuring one side of the relation - A user can follow many users
+            x.HasOne(o => o.Observer)
+                .WithMany(f => f.Followings)
+                .HasForeignKey(o => o.ObserverId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configuring the other side of the relation - A user can be followed many users
+            x.HasOne(o => o.Target)
+                .WithMany(f => f.Followers)
+                .HasForeignKey(o => o.TargetId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
 
         var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
             v => v.ToUniversalTime(), // Convert to UTC when saving to the database

@@ -142,7 +142,19 @@ We also added a reference in the `API` layer to the `Infrastructure` layer.
 The reason for that is that we do not want to implement the access to the user properties in the `Application` layer because it is not suppose to know about it (it is implemented in the `API` layer). So, we define only the interfaces in the `Application` layer and the implementation is done in the `Infrastructure` layer. Because the `Infrastructure` is implementing interfaces from the `Application` layer, the `Infrastructure` has a dependency on the `Application` layer.
 Since the `API` is also the startup project we define the dependeny container in that project (in the `Program.cs` file) so the `API` also has a dependency on the `Infrastructure`. We define the dependency the same way described above between the `Application` and the `Infrastructure` layers, by adding a project reference to the `API` and selecting the `Infrastructure` layer.
 After creating the interface (in the `Application` layer) and the implementation class (in the `Infrastructure` layer) we add them as a service the `Program.cs` (in the `API` layer) file as a scoped service because we need it to be scoped to the http request.
-Finally we can implement it in the required commands (such as in the `CreateActivity.cs` because we want to define that each user that creates an activity is automatically the host of that activity)
+Finally we can implement it in the required commands (such as in the `CreateActivity.cs` because we want to define that each user that creates an activity is automatically the host of that activity).
+
+### Creating Many to Many relationship in the DB
+
+#### __Use Case__ - A user can follow many other users, and can also can be followed (have followers) by many other users
+
+When creating a many to many relations it sometimes best to manually configure the relation.
+
+##### Steps:
+1. Create an entity in the `Domain` which will contain the required navigation properties. In this case all the properties will come from the `User` entity (many users will be related to many users).
+2. Define the required ICollections in the `User` entity - **Followings** and **Followers**.
+3. Define the DbSet and configure the relation in the `AppDbContext`. Remember to configure both sides of the relation to create a many to many.
+
 
 # -----------------------------------------------------------------------------------------------------------------
 ## FRONTEND - REACT

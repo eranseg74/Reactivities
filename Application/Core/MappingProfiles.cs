@@ -9,6 +9,10 @@ public class MappingProfiles : Profile
 {
     public MappingProfiles()
     {
+        // We want to map if the current user is following the received user ("Am I following the received user?"). Since we do not know here the current user's identity we define this optional string and set it to null.
+        // In the mapping configuration between the User and the UserProfile we map between the boolean variable Following and the result of checking if this currentUserId is in the Followers collection of the source, which is a User. Any way, we need to pass the currentUserId and we do so by passing it as a second parameter in the '.ProjectTo()' as defined in the GetFollowings class, in the "followers" case (In the switch statement) as a new object (new {currentUserId = userAccessor.GetUserId()}).
+        string? currentUserId = null;
+
         // The CreateMap method is used to create a mapping configuration between the source type (Activity) and the destination type (Activity). This means that AutoMapper will know how to map properties from an Activity object to another Activity object. In this case, since the source and destination types are the same, AutoMapper will simply copy the values of the properties from one Activity object to another when we use the Map method in our handlers. This is useful in scenarios like editing an activity, where we want to update an existing activity with new values without having to manually copy each property.
         CreateMap<Activity, Activity>();
         CreateMap<CreateActivityDto, Activity>();
@@ -34,14 +38,20 @@ public class MappingProfiles : Profile
             .ForMember(d => d.Bio, o => o.MapFrom(s => s.User.Bio))
             .ForMember(d => d.DisplayName, o => o.MapFrom(s => s.User.DisplayName))
             .ForMember(d => d.ImageUrl, o => o.MapFrom(s => s.User.ImageUrl))
-            .ForMember(d => d.Id, o => o.MapFrom(s => s.User.Id));
+            .ForMember(d => d.Id, o => o.MapFrom(s => s.User.Id))
+            .ForMember(d => d.FollowersCount, o => o.MapFrom(s => s.User.Followers.Count))
+            .ForMember(d => d.FollowingsCount, o => o.MapFrom(s => s.User.Followings.Count))
+            .ForMember(d => d.Following, o => o.MapFrom(s => s.User.Followers.Any(x => x.Observer.Id == currentUserId)));
 
         // Important!!! Do not call CreateMap twice or more for the same mapping. This will return null! Just chain the .ForMember() call on the same mapping (see above). The following will not work:
         /*
         CreateMap<Activity, ActivityDto>().ForMember(d => d.HostDisplayName, o => o.MapFrom(s => s.Attendees.FirstOrDefault(x => x.IsHost)!.User.DisplayName));
         CreateMap<Activity, ActivityDto>().ForMember(d => d.HostId, o => o.MapFrom(s => s.Attendees.FirstOrDefault(x => x.IsHost)!.User.Id));
         */
-        CreateMap<User, UserProfile>();
+        CreateMap<User, UserProfile>()
+            .ForMember(d => d.FollowersCount, o => o.MapFrom(s => s.Followers.Count))
+            .ForMember(d => d.FollowingsCount, o => o.MapFrom(s => s.Followings.Count))
+            .ForMember(d => d.Following, o => o.MapFrom(s => s.Followers.Any(x => x.Observer.Id == currentUserId)));
 
         // The Id, Body, and CreateAt are identical in both the Comment and the CommentDto and are not navigation properties so there is no need to specify them.
         CreateMap<Comment, CommentDto>()
