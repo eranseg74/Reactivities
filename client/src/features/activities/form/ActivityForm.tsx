@@ -47,16 +47,13 @@ export default function ActivityForm() {
     };
     try {
       if (activity) {
-        updateActivity.mutate(
-          { ...activity, ...flattenedData } as unknown as Activity,
-          {
-            onSuccess: () => {
-              navigate(`/activities/${activity.id}`);
-            },
+        updateActivity.mutate({ ...activity, ...flattenedData } as Activity, {
+          onSuccess: () => {
+            navigate(`/activities/${activity.id}`);
           },
-        );
+        });
       } else {
-        createActivity.mutate(flattenedData as unknown as Activity, {
+        createActivity.mutate(flattenedData, {
           onSuccess: (id) => {
             navigate(`/activities/${id}`);
           },

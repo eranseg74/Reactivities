@@ -31,7 +31,7 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
     // opt refers to the DbContextOptionsBuilder instance that is used to configure the database context.
     // Here, we are using the UseSqlite method to specify that we want to use SQLite as our database provider.
     // We are also retrieving the connection string from the configuration file using builder.Configuration.GetConnectionString("DefaultConnection").
-    opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
 // Adds cross-origin resource sharing services to the specified IServiceCollection.
@@ -109,6 +109,10 @@ app.UseCors(options => options.AllowAnyHeader().AllowAnyMethod().AllowCredential
 app.UseAuthentication(); // Use the authentication middleware to enable authentication in the application. This will allow us to authenticate users and protect certain endpoints that require authentication. By adding this middleware, we can ensure that only authenticated users can access protected resources and perform certain actions in the application, enhancing security and controlling access to sensitive data and functionality.
 app.UseAuthorization(); // Use the authorization middleware to enable authorization in the application. This will allow us to authorize users based on their roles and permissions, and protect certain endpoints that require specific roles or permissions. By adding this middleware, we can ensure that only authorized users can access protected resources and perform certain actions in the application, enhancing security and controlling access to sensitive data and functionality.
 
+// For deployment
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 app.MapControllers(); // This is the line that tells the API to use the controllers we defined. Without this line, the API will not be able to handle any requests and will return a 404 error for all requests.
 
 // Mapping the API Identity endpoint. This will automatically create endpoints for user registration, login, logout, and other identity-related operations based on the Identity framework. By mapping these endpoints, we can easily manage user authentication and authorization in our application without having to manually create these endpoints ourselves. The MapIdentityApi method is a convenient way to set up the necessary endpoints for user management and authentication using the Identity framework. We specify the type of the user as User, which is our custom user class that inherits from IdentityUser. This will allow us to manage users, roles, and other identity-related data in our database using Entity Framework Core and the Identity framework, and it will provide us with a set of endpoints to handle user registration, login, logout, and other identity-related operations out of the box. By using this method, we can save time and effort in setting up the necessary endpoints for user management and authentication in our application, and we can focus on implementing the core functionality of our application while still having robust user authentication and authorization features provided by the Identity framework. The "api" means that we will have to add "api" to the URL - //.../api/login (like all of our other endpoints)
@@ -116,6 +120,9 @@ app.MapGroup("api").MapIdentityApi<User>();
 
 // Add the SignalR middlware in order to tell the `API` server where to send the requests that are comming to a particular endpoint as our `SignalR` endpoint
 app.MapHub<CommentHub>("/comments");
+
+// Adds a specialized RouteEndpoint to the IEndpointRouteBuilder that will match requests for non-file-names with the lowest possible priority. The request will be routed to a controller endpoint that matches action, and controller (see the FallbackController.cs).
+app.MapFallbackToController("Index", "Fallback");
 
 // The using keyword ensures that the scope is disposed of correctly after use.
 // This is important for managing the lifetime of services and ensuring that resources are released properly.

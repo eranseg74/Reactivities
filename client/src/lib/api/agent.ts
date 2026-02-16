@@ -28,13 +28,13 @@ agent.interceptors.request.use((config) => {
 // The response interceptor is used to switch the isLoading state to false after the response is received, regardless of whether it is a success or an error. This way we can ensure that the loading spinner is hidden when the response is received, even if there is an error. The use funnction gets two parameters - the first one is the response object that we get when the request is successful, and the second one is the error object that we get when the request fails. We can use these parameters to switch the isLoading state to false in both cases.
 agent.interceptors.response.use(
   async (response) => {
-    await sleep(1000);
+    if (import.meta.env.DEV) await sleep(1000);
     // After getting the response - switching the isLoading state to false regardless success or error
     store.uiStore.isIdle();
     return response;
   },
   async (error) => {
-    await sleep(1000);
+    if (import.meta.env.DEV) await sleep(1000);
     // After getting the response - switching the isLoading state to false regardless success or error
     store.uiStore.isIdle();
     const { status, data } = error.response;

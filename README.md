@@ -320,3 +320,15 @@ To use Claudinary we need:
 2. Add a `ChatComment` type in the `index.d.ts` file.
 3. Add to the `.env.development` file the comments URL: `VITE_COMMENT_URL=https://localhost:5001/comments`. Important!!! The `/comments` at the end must match the path defined in the `MapHub` in the `Program.cs` class (`app.MapHub<CommentHub>("/comments");`). Otherwise this will not work.
 4. Create a hook (`useComments`) that will provide the ability to create and stop connections because we want this ability only in the chat component.
+
+# -----------------------------------------------------------------------------------------------------------------
+## DEPLOYMENT
+# -----------------------------------------------------------------------------------------------------------------
+
+#### Steps
+1. Make sure there are no URLs with `localhost` in the client folder
+2. Create a new `.env.production`, copy to this file the content of the `.env.development` file and remove the `https://localhost:5001` part. This will set the URL to a relative one and will be added to the path of the hosting platform (such as `Azure`, `AWS`, ...).
+3. Add the `build` object to the `vite.config.ts` file and specify in the object the location on the server from which the static files of the client will be created and served. In our case it will be from a `wwwroot` folder in the `API`.
+4. Run the `npm run build` command on the client folder and check for errors and warning.
+5. In the Program.cs class add the `app.UseDefaultFiles()` middleware that enables default file mapping on the current path (this means that on request the server will look for the `index.html` file in the `wwwroot` folder). Also add the `app.UseStaticFiles()` middleware that enables static file serving for the current request path which is the `wwwroot` folder.
+6. Create a callback controller to tell the server that if it encounters an unknown route it should pass it to the client and not try to handle it. This is due to the fact that the `API` is responsible for routing inside the server, and the client is responsible for routing in the client side. The name of the file must be `FallbackController`.

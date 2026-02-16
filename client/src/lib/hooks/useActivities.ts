@@ -9,6 +9,7 @@ import agent from '../api/agent';
 import { useLocation } from 'react-router';
 import { useAccount } from './useAccount';
 import { useStore } from './useStore';
+import type { FieldValues } from 'react-hook-form';
 
 export const useActivities = (id?: string) => {
   const {
@@ -98,17 +99,17 @@ export const useActivities = (id?: string) => {
   // useMutation is a hook that allows us to perform mutations, such as creating, updating, or deleting data. It accepts an object with two properties: mutationFn and onSuccess. mutationFn is a function that performs the mutation, and onSuccess is a function that is called when the mutation is successful. In this case, we are using useMutation to update an activity. The mutationFn is an asynchronous function that uses axios to send a PUT request to the API with the updated activity. The onSuccess function invalidates the "activities" query, which triggers a refetch of the activities data.
   const updateActivity = useMutation({
     mutationFn: async (activity: Activity) => {
-      await agent.put('/activities', activity);
+      await agent.put(`/activities/${activity.id}`, activity);
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ['activities'],
+        queryKey: ['activities', activity?.id],
       });
     },
   });
 
   const createActivity = useMutation({
-    mutationFn: async (activity: Activity) => {
+    mutationFn: async (activity: FieldValues) => {
       const response = await agent.post('/activities', activity);
       return response.data; // Note that the create API call as impementerd in the server, returns the activity id. We want to return it so we can use it to dispay the activity after creation
     },
