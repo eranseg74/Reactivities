@@ -2,6 +2,11 @@
 
 // The best way to define types while avoiding typing errors is to take the object data from the API call and paste it in the Json to Typescript site
 
+type PagedList<T, TCursor> = {
+  items: T[];
+  nextCursor: TCursor;
+};
+
 type Activity = {
   id: string;
   title: string;
@@ -18,7 +23,7 @@ type Activity = {
   isHost: boolean;
   hostId: string;
   hostDisplayName: string;
-  hostImageUrl: string;
+  hostImageUrl?: string;
 };
 
 type Profile = {

@@ -18,7 +18,7 @@ function App() {
       ) : (
         <>
           <NavBar />
-          <Container maxWidth='xl' sx={{ mt: 3 }}>
+          <Container maxWidth='xl' sx={{ pt: 14 }}>
             {/* The outlet is the place where the routed components are rendered. When we route to a specific path, the component that is defined as its element will be rendered here */}
             <Outlet />
           </Container>

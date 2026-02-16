@@ -1,37 +1,34 @@
-using System;
 using Application.Activities.DTOs;
 using Application.Core;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using Domain;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
-namespace Application.Activities.Queries
-{
-    public class GetComments
-    {
-        public class Query : IRequest<Result<List<CommentDto>>>
-        {
-            public required string ActivityId { get; set; }
-        }
+namespace Application.Activities.Queries;
 
-        public class Handler(AppDbContext dbContext, IMapper mapper) : IRequestHandler<Query, Result<List<CommentDto>>>
+public class GetComments
+{
+    public class Query : IRequest<Result<List<CommentDto>>>
+    {
+        public required string ActivityId { get; set; }
+    }
+
+    public class Handler(AppDbContext dbContext, IMapper mapper) : IRequestHandler<Query, Result<List<CommentDto>>>
+    {
+        public async Task<Result<List<CommentDto>>> Handle(Query request, CancellationToken cancellationToken)
         {
-            public async Task<Result<List<CommentDto>>> Handle(Query request, CancellationToken cancellationToken)
+            var comments = await dbContext.Comments
+                .Where(x => x.ActivityId == request.ActivityId)
+                .OrderByDescending(x => x.CreatedAt)
+                .ProjectTo<CommentDto>(mapper.ConfigurationProvider)
+                .ToListAsync(cancellationToken);
+            if (comments == null)
             {
-                var comments = await dbContext.Comments
-                    .Where(x => x.ActivityId == request.ActivityId)
-                    .OrderByDescending(x => x.CreatedAt)
-                    .ProjectTo<CommentDto>(mapper.ConfigurationProvider)
-                    .ToListAsync(cancellationToken);
-                if (comments == null)
-                {
-                    return Result<List<CommentDto>>.Failure("Problem getting the comments for " + request.ActivityId + " id", 400);
-                }
-                return Result<List<CommentDto>>.Success(comments);
+                return Result<List<CommentDto>>.Failure("Problem getting the comments for " + request.ActivityId + " id", 400);
             }
+            return Result<List<CommentDto>>.Success(comments);
         }
     }
 }

@@ -1,5 +1,10 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace Domain;
 
+// We are adding the Index annotation because we are using pagination so if we want to increase the efficiency of fetching the desired batch of items each time we can index the Date field. By defaul EF indexes the Id property so we need to index any other property manually. Note that this annotation has to be on the Class level.
+// Important!!! Adding Index requires migration!!!
+[Index(nameof(Date))]
 public class Activity
 {
     // Unique identifier for the activity. Must be public because the Entity Framework needs to access it. Otherwise it will throw an error.
