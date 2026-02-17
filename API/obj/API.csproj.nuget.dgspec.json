@@ -1376,6 +1376,10 @@
             "CloudinaryDotNet": {
               "target": "Package",
               "version": "[1.28.0, )"
+            },
+            "Resend": {
+              "target": "Package",
+              "version": "[0.2.1, )"
             }
           },
           "imports": [

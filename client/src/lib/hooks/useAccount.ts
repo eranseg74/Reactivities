@@ -23,10 +23,6 @@ export const useAccount = () => {
     mutationFn: async (creds: RegisterSchema) => {
       await agent.post('/account/register', creds);
     },
-    onSuccess: () => {
-      toast.success('Register successful - you can now login');
-      navigate('/login');
-    },
   });
 
   const logoutUser = useMutation({
@@ -37,6 +33,34 @@ export const useAccount = () => {
       queryClient.removeQueries({ queryKey: ['user'] });
       queryClient.removeQueries({ queryKey: ['activities'] });
       await navigate('/');
+    },
+  });
+
+  // The URL can be validated in the dotnet documentation since we are using the endpoint provided by Identity
+  const verifyEmail = useMutation({
+    mutationFn: async ({ userId, code }: { userId: string; code: string }) => {
+      await agent.get(`/confirmEmail?userId=${userId}&code=${code}`);
+    },
+  });
+
+  const resendConfirmationEmail = useMutation({
+    mutationFn: async ({
+      email,
+      userId,
+    }: {
+      email?: string;
+      userId?: string | null;
+    }) => {
+      // await agent.get(`/account/resendConfirmEmail?email=${email}&userId={userId}`); // In case of many params it is better to write it like this:
+      await agent.get(`/account/resendConfirmEmail`, {
+        params: {
+          email,
+          userId,
+        },
+      });
+    },
+    onSuccess: () => {
+      toast.success('Email sent - please check your email');
     },
   });
 
@@ -56,5 +80,7 @@ export const useAccount = () => {
     logoutUser,
     loadingUserInfo,
     registerUser,
+    verifyEmail,
+    resendConfirmationEmail,
   };
 };
