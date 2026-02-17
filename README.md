@@ -332,3 +332,40 @@ To use Claudinary we need:
 4. Run the `npm run build` command on the client folder and check for errors and warning.
 5. In the Program.cs class add the `app.UseDefaultFiles()` middleware that enables default file mapping on the current path (this means that on request the server will look for the `index.html` file in the `wwwroot` folder). Also add the `app.UseStaticFiles()` middleware that enables static file serving for the current request path which is the `wwwroot` folder.
 6. Create a callback controller to tell the server that if it encounters an unknown route it should pass it to the client and not try to handle it. This is due to the fact that the `API` is responsible for routing inside the server, and the client is responsible for routing in the client side. The name of the file must be `FallbackController`.
+
+# -----------------------------------------------------------------------------------------------------------------
+## RESEND
+# -----------------------------------------------------------------------------------------------------------------
+
+Resend is an Email Server that offers Email services such as email confirmation, email resend, etc.
+To start working with it we need to generate an ApiKey in the Resend web site and save it in the appsettings.json file:
+```C#
+"Resend": {
+    "ApiToken": "<Resend_ApiKey>"
+  },
+  ...
+```
+In the Program.cs file we need to add the following configuration:
+```C#
+builder.Services.AddHttpClient<ResendClient>();
+builder.Services.Configure<ResendClientOptions>(opt =>
+{
+    opt.ApiToken = builder.Configuration["Resend:ApiToken"]!;
+});
+builder.Services.AddTransient<IResend, ResendClient>();
+```
+
+Then, add the option of the email confirmation in the Program.cs file:
+```C#
+builder.Services.AddIdentityApiEndpoints<User>(opt =>
+{
+    opt.User.RequireUniqueEmail = true;
+    opt.SignIn.RequireConfirmedEmail = true; // Added
+}).AddRoles<IdentityRole>().AddEntityFrameworkStores<AppDbContext>();
+```
+
+Create an EmailSender class that will implement the IEmailSender interface provided by AspNetCore.Identity.
+After that, add it as a service in the Program.cs class:
+```C#
+builder.Services.AddTransient<IEmailSender<User>, EmailSender>();
+```
