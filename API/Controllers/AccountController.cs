@@ -95,4 +95,21 @@ public class AccountController(SignInManager<User> signInManager, IEmailSender<U
         await signInManager.SignOutAsync(); // This also removes the cookie
         return NoContent();
     }
+
+    [HttpPost("change-password")]
+    public async Task<ActionResult> ChangePassword(ChangePasswordDto passwordDto)
+    {
+        // The User here refers to the ClaimPrinciple we get from the Identity framework
+        var user = await signInManager.UserManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+        var result = await signInManager.UserManager.ChangePasswordAsync(user, passwordDto.CurrentPassword, passwordDto.NewPassword);
+        if (result.Succeeded)
+        {
+            return Ok();
+        }
+        return BadRequest(result.Errors.First().Description);
+    }
 }

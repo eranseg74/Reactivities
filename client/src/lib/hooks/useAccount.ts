@@ -3,11 +3,24 @@ import agent from '../api/agent';
 import { useNavigate } from 'react-router';
 import type { RegisterSchema } from '../schemas/registerSchema';
 import { toast } from 'react-toastify';
+import type { ChangePasswordSchema } from '../schemas/changePasswordSchema';
 
 export const useAccount = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
+  // Queries
+  const { data: currentUser, isLoading: loadingUserInfo } = useQuery({
+    queryKey: ['user'],
+    queryFn: async () => {
+      const response = await agent.get<User>('/account/user-info');
+      return response.data;
+    },
+    // We don't want to run this function every time we navigate to a page because it will make an API call every time. We only want to run this function when the user is not logged in because if the user is logged in we already have the user info in the cache. So we check if the user info is in the cache and if it is not we run the function to get the user info. This way we only run the function when we need to and we don't make unnecessary API calls.
+    enabled: !queryClient.getQueryData(['user']),
+  });
+
+  // Mutations
   // This function is the login function which is provided by Identity framework. If authenticated it will automatically create a cookie for the user. On success it will run the user-info API call to get the user details because the browser cannot access the cookie. This is done by invalidating the user info on he cache which will make the application run the query again to get the data. This way the browser knows which user is entered for UI purposes.
   const loginUser = useMutation({
     mutationFn: async (creds: LoginStatus) => {
@@ -64,14 +77,22 @@ export const useAccount = () => {
     },
   });
 
-  const { data: currentUser, isLoading: loadingUserInfo } = useQuery({
-    queryKey: ['user'],
-    queryFn: async () => {
-      const response = await agent.get<User>('/account/user-info');
-      return response.data;
+  const changePassword = useMutation({
+    mutationFn: async (data: ChangePasswordSchema) => {
+      await agent.post('/account/change-password', data);
     },
-    // We don't want to run this function every time we navigate to a page because it will make an API call every time. We only want to run this function when the user is not logged in because if the user is logged in we already have the user info in the cache. So we check if the user info is in the cache and if it is not we run the function to get the user info. This way we only run the function when we need to and we don't make unnecessary API calls.
-    enabled: !queryClient.getQueryData(['user']),
+  });
+
+  const forgotPassword = useMutation({
+    mutationFn: async (email: string) => {
+      await agent.post('/forgotPassword', { email });
+    },
+  });
+
+  const resetPassword = useMutation({
+    mutationFn: async (data: ResetPassword) => {
+      await agent.post('/resetPassword', data);
+    },
   });
 
   return {
@@ -82,5 +103,8 @@ export const useAccount = () => {
     registerUser,
     verifyEmail,
     resendConfirmationEmail,
+    changePassword,
+    forgotPassword,
+    resetPassword,
   };
 };
