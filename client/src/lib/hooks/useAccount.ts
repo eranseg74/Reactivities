@@ -95,6 +95,19 @@ export const useAccount = () => {
     },
   });
 
+  const fetchGithubToken = useMutation({
+    mutationFn: async (code: string) => {
+      // Not really need to return data. Returning it just for learning purposes to see the GitHub response
+      const response = await agent.post(`/account/github-login?code=${code}`);
+      return response.data;
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ['user'],
+      });
+    },
+  });
+
   return {
     loginUser,
     currentUser,
@@ -106,5 +119,6 @@ export const useAccount = () => {
     changePassword,
     forgotPassword,
     resetPassword,
+    fetchGithubToken,
   };
 };

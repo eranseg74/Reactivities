@@ -369,3 +369,39 @@ After that, add it as a service in the Program.cs class:
 ```C#
 builder.Services.AddTransient<IEmailSender<User>, EmailSender>();
 ```
+
+# -----------------------------------------------------------------------------------------------------------------
+## LOGIN WITH GITHUB
+# -----------------------------------------------------------------------------------------------------------------
+
+The following is a description on how to implement login using **GitHub**.
+To enable this, **GitHub** and the server must share a secret key.
+The flow is as follows:
+1. When a user clicks on the `Login` (with **GitHub**), a request to **GitHub** will be sent. **GitHub** will respond with a `code` back to the **Client**.
+2. The **Client** will send a request to the **Server** with that code.
+3. The **Server** will send a request with that code to get the user profile from **GitHub**.
+4. The **Server** will authenticate the profile and only then will login the user.
+
+##### Steps
+1. Generate an Auth application in **GitHub**. In the creation process, provide the application name and the **Client URL** so **GitHub** will know where to send back the response. Also define the `Authorization callback URL`. **GitHub** will generate a **ClientId** and provide an option to generate a **ClientSecret** key. These codes will be placed in the `appsettings.json` file in the `API` like this:
+```C#
+"Authentication": {
+    "GitHub": {
+      "ClientId": "Ov23ctWyKhtSFp7w1ROx",
+      "ClientSecret": "7510c7eb6902f31bc87757fc3af7bdbf72e6f375"
+    }
+  },
+```
+2. . Also the **ClientId** will be added to the .env.development file in the client folder like this (make sure there are no spellings errors):
+  ```
+  VITE_GITHUB_CLIENT_ID=<Client ID>
+  VITE_REDIRECT_URL=https://localhost:3000/auth-callback
+  ```
+3. Since we want access to the user's email account in **GitHub** we need to define in the `URL` the **scope** attribute: `&scope=read:user user:email` which tells **GitHub** that we want access to read the user's profile (the public stuff) and also access to the user's email (since users can define their emails as private). The users will be prompt with a message whether they authorize the access.
+4. In the client:
+   1. Add a mutation function in the `useAccount.ts` to fetch the code from **GitHub**.
+   2. Add a button in the `LoginForm.tsx` to allow login with **GitHub**.
+   3. Create a new AuthCallback.tsx component that will be displayed when clicking on the **Login with GitHub** button.
+   4. Add the route to the AuthCallback component in the `Routes.tsx` file.
+5. In DotNet
+   1. 
