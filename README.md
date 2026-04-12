@@ -311,7 +311,7 @@ To use Claudinary we need:
 4. Create a `CommentDto` class in order to send the required data to the client.
 5. Create a mapping from the `Comment` to the `CommentDto` in the `mappingProfiles.cs` class.
 6. Create a `Handler` to create a `Comment`, and another `Handler` for getting all the comments of a specific activity.
-7. Create the SignalR hub. In this case it will be thr `CommentHub`.
+7. Create the SignalR hub. In this case it will be the `CommentHub`.
 8. Add the `SignalR` as a service in the `Program.cs` class.
 9. Add the `SignalR` as a middleware in order to tell the `API` server where to send the requests that are comming to a particular endpoint as our `SignalR` endpoint. Also in the `Program.cs` class.
 
